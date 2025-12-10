@@ -19,6 +19,14 @@ function Information() {
             Dashboard
           </span>
 
+          {/* ✅ UPDATE REDIRECTS */}
+          <span
+            style={styles.link}
+            onClick={() => navigate("/update")}
+          >
+            Daily Updates
+          </span>
+
           <span style={styles.link}>Industries</span>
           <span style={styles.link}>People</span>
           <span style={styles.link}>Insights</span>

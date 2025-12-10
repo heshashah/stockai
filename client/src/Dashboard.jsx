@@ -12,6 +12,15 @@ function Dashboard() {
 
         <div style={styles.navLinks}>
           <span style={styles.link}>Dashboard</span>
+
+          {/* ✅ THIS NOW REDIRECTS */}
+          <span
+            style={styles.link}
+            onClick={() => navigate("/update")}
+          >
+            Daily Updates
+          </span>
+
           <span style={styles.link}>Industries</span>
           <span style={styles.link}>People</span>
           <span style={styles.link}>Insights</span>

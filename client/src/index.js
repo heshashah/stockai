@@ -6,6 +6,7 @@ import { GoogleOAuthProvider } from "@react-oauth/google";
 import Login from "./Login";
 import Dashboard from "./Dashboard";
 import Information from "./Information";
+import Update from "./Update";
 
 const root = ReactDOM.createRoot(document.getElementById("root"));
 
@@ -16,6 +17,7 @@ root.render(
         <Route path="/" element={<Login />} />
         <Route path="/dashboard" element={<Dashboard />} />
         <Route path="/information" element={<Information />} />
+        <Route path="/update" element={<Update />} />
       </Routes>
     </BrowserRouter>
   </GoogleOAuthProvider>
