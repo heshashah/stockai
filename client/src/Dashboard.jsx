@@ -14,11 +14,18 @@ function Dashboard() {
           <span style={styles.link}>Dashboard</span>
 
           {/* ✅ THIS NOW REDIRECTS */}
-          <span
+          {/* <span
             style={styles.link}
             onClick={() => navigate("/update")}
           >
             Daily Updates
+          </span> */}
+
+          <span
+            style={styles.link}
+            onClick={() => navigate("/sensex")}
+          >
+            Sensex
           </span>
 
           <span style={styles.link}>Industries</span>

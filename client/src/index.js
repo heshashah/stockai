@@ -6,7 +6,8 @@ import { GoogleOAuthProvider } from "@react-oauth/google";
 import Login from "./Login";
 import Dashboard from "./Dashboard";
 import Information from "./Information";
-import Update from "./Update";
+//import Update from "./Update";
+import SensexChart from "./SensexChart";
 
 const root = ReactDOM.createRoot(document.getElementById("root"));
 
@@ -17,7 +18,8 @@ root.render(
         <Route path="/" element={<Login />} />
         <Route path="/dashboard" element={<Dashboard />} />
         <Route path="/information" element={<Information />} />
-        <Route path="/update" element={<Update />} />
+        {/* <Route path="/update" element={<Update />} /> */}
+        <Route path="/sensex" element={<SensexChart />} />
       </Routes>
     </BrowserRouter>
   </GoogleOAuthProvider>

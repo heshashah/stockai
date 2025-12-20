@@ -23,7 +23,7 @@ function Update() {
     return () => clearInterval(interval);
   }, []);
 
-  // ✅ ✅ ✅ FIXED FETCH FUNCTION (PORT 5001 + SINGLE POINT SUPPORT)
+  // FIXED FETCH FUNCTION (PORT 5001 + SINGLE POINT SUPPORT)
   const fetchSensexData = async () => {
     try {
       const res = await fetch("http://localhost:5001/api/sensex");
@@ -50,7 +50,7 @@ function Update() {
 
   return (
     <div style={styles.page}>
-      {/* ✅ NAVBAR */}
+      {/* NAVBAR */}
       <div style={styles.navbar}>
         <h3 style={styles.logo}>StockAI</h3>
 
@@ -78,7 +78,7 @@ function Update() {
         </div>
       </div>
 
-      {/* ✅ BODY */}
+      {/* BODY */}
       <div style={styles.body}>
         <h1>BSE SENSEX Live</h1>
 
@@ -88,7 +88,7 @@ function Update() {
           {change < 0 ? "▼" : "▲"} {change}
         </p>
 
-        {/* ✅ ✅ ✅ FIXED LIVE CHART */}
+        {/* FIXED LIVE CHART */}
         <div
           style={{
             width: "100%",
@@ -111,7 +111,7 @@ function Update() {
                 <Tooltip />
                 <CartesianGrid strokeDasharray="3 3" />
 
-                {/* ✅ DOT IS REQUIRED FOR SINGLE DATA POINT */}
+                {/* DOT IS REQUIRED FOR SINGLE DATA POINT */}
                 <Line
                   type="monotone"
                   dataKey="price"
@@ -130,7 +130,7 @@ function Update() {
 
 export default Update;
 
-/* ✅ INTERNAL CSS */
+/* INTERNAL CSS */
 const styles = {
   page: {
     minHeight: "100vh",

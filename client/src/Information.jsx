@@ -20,11 +20,18 @@ function Information() {
           </span>
 
           {/* ✅ UPDATE REDIRECTS */}
-          <span
+          {/* <span
             style={styles.link}
             onClick={() => navigate("/update")}
           >
             Daily Updates
+          </span> */}
+
+           <span
+            style={styles.link}
+            onClick={() => navigate("/sensex")}
+          >
+            Sensex
           </span>
 
           <span style={styles.link}>Industries</span>
@@ -32,7 +39,12 @@ function Information() {
           <span style={styles.link}>Insights</span>
 
           {/* ✅ ACTIVE PAGE */}
-          <span style={styles.activeLink}>Information</span>
+          <span
+            style={styles.link}
+            onClick={() => navigate("/information")}
+          >
+            Information
+          </span>
         </div>
 
         <div>

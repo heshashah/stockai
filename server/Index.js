@@ -1,4 +1,6 @@
 // ✅ Load variables from .env
+import { spawn } from "child_process";
+
 require("dotenv").config();
 
 const express = require("express");
@@ -22,29 +24,26 @@ app.use(
 
 app.use(express.json());
 
-// ✅ ✅ ✅ SENSEX DAILY ROUTE (FREE PLAN SAFE)
-app.get("/api/sensex", async (req, res) => {
-  try {
-    const url = `https://eodhd.com/api/eod/AAPL.US?api_token=693845dbec47f2.81582732&fmt=json`;
+/* ❌❌❌ COMMENTED: OVERLAPPING SENSEX / GRAPH API ❌❌❌
+   Reason:
+   - Sensex + chart data is handled by Flask (Python)
+   - This route was conflicting and returning wrong data format
+*/
 
-    const response = await fetch(url);
-    const data = await response.json();
+// app.get("/api/sensex", async (req, res) => {
+//   try {
+//     const url = `https://eodhd.com/api/eod/AAPL.US?api_token=693845dbec47f2.81582732&fmt=json`;
 
-    // ✅ Send today's data only
-    res.json(data[0]);
-  } catch (error) {
-    console.error("❌ Sensex API Error:", error);
-    res.status(500).json({ error: "Sensex fetch failed" });
-  }
-});
-// app.get("/api/sensex", (req, res) => {
-//   res.status(200).json({
-//     status: "OK",
-//     message: "Backend is working perfectly",
-//     testValue: 12345
-//   });
+//     const response = await fetch(url);
+//     const data = await response.json();
+
+//     // ❌ Not Sensex + wrong format for chart
+//     res.json(data[0]);
+//   } catch (error) {
+//     console.error("❌ Sensex API Error:", error);
+//     res.status(500).json({ error: "Sensex fetch failed" });
+//   }
 // });
-
 
 /* ✅ GOOGLE CLIENT */
 const client = new OAuth2Client(process.env.GOOGLE_CLIENT_ID);
@@ -93,8 +92,8 @@ app.post("/google-login", async (req, res) => {
   }
 });
 
-/* ✅ ✅ ✅ START SERVER ONCE */
-const PORT = 5001
-app.listen(process.env.PORT, () => {
-  console.log(`✅ Server running on http://localhost:${process.env.PORT}`);
+/* ✅ ✅ ✅ START SERVER */
+const PORT = process.env.PORT || 5001;
+app.listen(PORT, () => {
+  console.log(`✅ Server running on http://localhost:${PORT}`);
 });
