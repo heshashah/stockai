@@ -11,7 +11,7 @@ export default function RiskDashboard() {
   const [loadingIPO, setLoadingIPO] = useState(false);
 
   const navigate = useNavigate();
-  
+
   //  UPDATED IPO LIST (WITH KEY + NAME)
   const ipoList = [
     { name: "MARC Technocrats", key: "marc_technocrats" },
@@ -26,6 +26,14 @@ export default function RiskDashboard() {
     { name: "ICICI Prudential AMC", key: "icici_prudential" },
     { name: "Corona Remedies", key: "corona_remedies" },
     { name: "Riddhi Display", key: "riddhi_display" },
+    { name: "Gujarat Kidney & Super Speciality Ltd", key: "gujarat_kidney_speciality" },
+    { name: "Admach Systems Ltd", key: "admach_systems" },
+    { name: "Dachepalli Publishers Ltd", key: "dachepalli_publishers" },
+    { name: "EPW India Ltd", key: "epw_india" },
+    { name: "Shyam Dhani Industries", key: "shyam_dhani_industries" },
+    { name: "Phytochem Remedies (India) Ltd", key: "phytochem_remedies" },
+    { name: "Apollo Techno Industries", key: "apollo_techno_industries" },
+    { name: "Nanta Tech Ltd", key: "nanta_tech" }
   ];
 
   //  OPEN IPO POPUP
@@ -61,7 +69,7 @@ export default function RiskDashboard() {
   //  UI RENDER
   return (
     <div style={styles.page}>
-      
+
       {/* NAVBAR */}
       <div style={styles.navbar}>
         <h3 style={styles.logo}>StockAI</h3>
@@ -100,7 +108,7 @@ export default function RiskDashboard() {
       {showPopup && selectedIPO && (
         <div style={styles.popupOverlay}>
           <div style={styles.popup}>
-            
+
             <h2>{selectedIPO.name}</h2>
 
             {/* LOADING TEXT */}
