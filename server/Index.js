@@ -177,6 +177,35 @@ app.get("/api/ipo", async (req, res) => {
   }
 });
 
+// AI RISK PREDICTION (IPO)
+app.post("/api/ipo/ai", (req, res) => {
+  const data = req.body;
+
+  const python = spawn("python3", ["ipo_risk_api.py"]);
+
+  python.stdin.write(JSON.stringify(data));
+  python.stdin.end();
+
+  let result = "";
+
+  python.stdout.on("data", (chunk) => {
+    result += chunk.toString();
+  });
+
+  python.stdout.on("end", () => {
+    try {
+      res.json(JSON.parse(result));
+    } catch (err) {
+      res.status(500).json({ error: "AI model failed" });
+    }
+  });
+
+  python.stderr.on("data", (data) => {
+    console.error("AI ERROR:", data.toString());
+  });
+});
+
+
 /* START SERVER */
 const PORT = process.env.PORT || 5001;
 app.listen(PORT, () => {

@@ -3,16 +3,17 @@ import axios from "axios";
 import { useNavigate } from "react-router-dom";
 
 export default function RiskDashboard() {
-  const [risk, setRisk] = useState(null);
   const [selectedIPO, setSelectedIPO] = useState(null);
   const [showPopup, setShowPopup] = useState(false);
 
   const [ipoData, setIpoData] = useState(null);
   const [loadingIPO, setLoadingIPO] = useState(false);
 
+  const [aiData, setAiData] = useState(null);   // ✅ Correct place
+
   const navigate = useNavigate();
 
-  //  UPDATED IPO LIST (WITH KEY + NAME)
+  // IPO LIST
   const ipoList = [
     { name: "MARC Technocrats", key: "marc_technocrats" },
     { name: "Wakefit Innovations Ltd", key: "wakefit" },
@@ -36,41 +37,55 @@ export default function RiskDashboard() {
     { name: "Nanta Tech Ltd", key: "nanta_tech" }
   ];
 
-  //  OPEN IPO POPUP
+  // OPEN POPUP + FETCH IPO DATA
   const openIPO = (ipo) => {
-    setSelectedIPO(ipo);   // now storing full object {name, key}
+    setSelectedIPO(ipo);
     setShowPopup(true);
     setLoadingIPO(true);
     setIpoData(null);
+    setAiData(null);
+
+    axios
+      .get(`http://localhost:5001/api/ipo?key=${ipo.key}`)
+      .then((res) => {
+        setIpoData(res.data);
+        setLoadingIPO(false);
+      })
+      .catch(() => setLoadingIPO(false));
   };
 
+  // CLOSE POPUP
   const closePopup = () => {
     setShowPopup(false);
     setSelectedIPO(null);
     setIpoData(null);
+    setAiData(null);
   };
 
-  //  FETCH IPO DETAILS WHEN selectedIPO CHANGES
+  // ------------------------
+  // FETCH AI RISK ANALYSIS AFTER IPO DATA ARRIVES
+  // ------------------------
   useEffect(() => {
-    if (selectedIPO) {
-      axios
-        .get(`http://localhost:5001/api/ipo?key=${selectedIPO.key}`)
-        .then((res) => {
-          setIpoData(res.data);
-          setLoadingIPO(false);
-        })
-        .catch((err) => {
-          console.error(err);
-          setLoadingIPO(false);
-        });
-    }
-  }, [selectedIPO]);
+    if (!ipoData) return;
 
-  //  UI RENDER
+    const payload = {
+      sentiment: Math.random(),
+      financial_ratio: Math.random(),
+      subscription: Math.random(),
+      peer_strength: Math.random(),
+      prices: [100, 102, 98, 101, 99, 105]
+    };
+
+    axios
+      .post("http://localhost:5001/api/ipo/ai", payload)
+      .then((res) => setAiData(res.data))
+      .catch((err) => console.error("AI ERROR:", err));
+  }, [ipoData]);
+
   return (
     <div style={styles.page}>
 
-      {/* NAVBAR */}
+      {/* ---------------- NAVBAR ---------------- */}
       <div style={styles.navbar}>
         <h3 style={styles.logo}>StockAI</h3>
 
@@ -90,7 +105,7 @@ export default function RiskDashboard() {
         </div>
       </div>
 
-      {/* BODY CONTENT */}
+      {/* ---------------- BODY ---------------- */}
       <div style={styles.body}>
         <h1 style={{ marginTop: "40px", fontSize: "28px" }}>Available IPOs</h1>
 
@@ -104,38 +119,56 @@ export default function RiskDashboard() {
         </div>
       </div>
 
-      {/* POPUP WINDOW */}
+      {/* ---------------- POPUP ---------------- */}
       {showPopup && selectedIPO && (
         <div style={styles.popupOverlay}>
           <div style={styles.popup}>
-
             <h2>{selectedIPO.name}</h2>
 
-            {/* LOADING TEXT */}
             {loadingIPO && <p>Loading IPO details...</p>}
 
-            {/* IPO DATA FROM BACKEND */}
+            {/* IPOWATCH + MARKET DATA */}
             {ipoData && (
-              <div style={{ textAlign: "left", marginTop: "15px" }}>
+              <>
                 <h3>📌 IPOWatch Data</h3>
-                <p><b>GMP:</b> {ipoData.ipowatch?.gmp || "N/A"}</p>
-                <p><b>IPO Price:</b> {ipoData.ipowatch?.ipo_price || "N/A"}</p>
-                <p><b>Listing Gain:</b> {ipoData.ipowatch?.listing_gain || "N/A"}</p>
-                <p><b>IPO Type:</b> {ipoData.ipowatch?.ipo_type || "N/A"}</p>
+                <p><b>GMP:</b> {ipoData.ipowatch?.gmp}</p>
+                <p><b>IPO Price:</b> {ipoData.ipowatch?.ipo_price}</p>
+                <p><b>Listing Gain:</b> {ipoData.ipowatch?.listing_gain}</p>
+                <p><b>IPO Type:</b> {ipoData.ipowatch?.ipo_type}</p>
 
-                <hr style={{ margin: "15px 0" }} />
+                <hr />
 
                 <h3>📌 Market Data</h3>
-                <p><b>Market Price:</b> {ipoData.market?.market_price || "N/A"}</p>
-                <p><b>Market Cap:</b> {ipoData.market?.market_cap || "N/A"}</p>
-                <p><b>Last Quarter Revenue:</b> {ipoData.market?.last_quarter_revenue || "N/A"}</p>
-                <p><b>Sector:</b> {ipoData.market?.sector || "N/A"}</p>
-                <p><b>Industry:</b> {ipoData.market?.industry || "N/A"}</p>
-              </div>
+                <p><b>Market Price:</b> {ipoData.market?.market_price}</p>
+                <p><b>Market Cap:</b> {ipoData.market?.market_cap}</p>
+                <p><b>Last Quarter Revenue:</b> {ipoData.market?.last_quarter_revenue}</p>
+                <p><b>Sector:</b> {ipoData.market?.sector}</p>
+                <p><b>Industry:</b> {ipoData.market?.industry}</p>
+              </>
+            )}
+
+            {/* ---------------- AI ANALYSIS ---------------- */}
+            {aiData && (
+              <>
+                <hr />
+                <h3>🤖 AI Risk Analysis</h3>
+
+                <p><b>Risk Score:</b> {aiData.risk_score}</p>
+                <p><b>Volatility:</b> {aiData.volatility}</p>
+                <p><b>Logistic Score:</b> {aiData.logistic}</p>
+                <p><b>Random Forest Score:</b> {aiData.random_forest}</p>
+
+                <p style={{ fontWeight: "bold", marginTop: "10px" }}>
+                  {aiData.risk_score < 0.4
+                    ? "🟢 Suggested: Low Risk — Good Buy"
+                    : aiData.risk_score < 0.7
+                      ? "🟡 Suggested: Medium Risk — Be Cautious"
+                      : "🔴 Suggested: High Risk — Avoid"}
+                </p>
+              </>
             )}
 
             <button style={styles.closeBtn} onClick={closePopup}>Close</button>
-
           </div>
         </div>
       )}
@@ -143,133 +176,36 @@ export default function RiskDashboard() {
   );
 }
 
-/* STYLES */
+/* ---------------- STYLES ---------------- */
 const styles = {
-  page: {
-    minHeight: "100vh",
-    background: "#f4f6f5",
-    fontFamily: "Poppins, sans-serif",
-  },
-
+  page: { minHeight: "100vh", background: "#f4f6f5", fontFamily: "Poppins" },
   navbar: {
-    display: "flex",
-    justifyContent: "space-between",
-    padding: "20px 50px",
-    background: "#2f4f3e",
-    color: "white",
-    alignItems: "center",
+    display: "flex", justifyContent: "space-between", padding: "20px 50px",
+    background: "#2f4f3e", color: "white", alignItems: "center"
   },
-
-  logo: {
-    fontWeight: "600",
-    fontSize: "18px",
-  },
-
-  navLinks: {
-    display: "flex",
-    gap: "25px",
-    fontSize: "14px",
-  },
-
-  link: {
-    cursor: "pointer",
-    transition: "0.2s",
-  },
-
-  phoneBtn: {
-    marginRight: "12px",
-    padding: "8px 16px",
-    border: "1px solid white",
-    background: "transparent",
-    color: "white",
-    borderRadius: "6px",
-    cursor: "pointer",
-  },
-
-  contactBtn: {
-    padding: "8px 16px",
-    background: "white",
-    color: "#2f4f3e",
-    border: "none",
-    borderRadius: "6px",
-    fontWeight: "600",
-    cursor: "pointer",
-  },
-
-  body: {
-    padding: "40px",
-    textAlign: "center",
-  },
-
-  ipoGrid: {
-    marginTop: "30px",
-    display: "flex",
-    justifyContent: "center",
-    gap: "20px",
-    flexWrap: "wrap",
-  },
-
+  logo: { fontWeight: "600", fontSize: "18px" },
+  navLinks: { display: "flex", gap: "25px", fontSize: "14px" },
+  link: { cursor: "pointer" },
+  phoneBtn: { marginRight: "12px", padding: "8px 16px", border: "1px solid white", background: "transparent", color: "white", borderRadius: "6px" },
+  contactBtn: { padding: "8px 16px", background: "white", color: "#2f4f3e", borderRadius: "6px", fontWeight: "600" },
+  body: { padding: "40px", textAlign: "center" },
+  ipoGrid: { marginTop: "30px", display: "flex", gap: "20px", flexWrap: "wrap", justifyContent: "center" },
   ipoCard: {
-    padding: "20px",
-    background: "#2f4f3e",
-    color: "white",
-    borderRadius: "10px",
-    cursor: "pointer",
-    width: "260px",
-    textAlign: "center",
-    fontWeight: "600",
-    transition: "0.3s",
-    display: "flex",
-    flexDirection: "column",
-    alignItems: "center",
+    padding: "20px", background: "#2f4f3e", color: "white",
+    borderRadius: "10px", width: "260px", cursor: "pointer",
+    display: "flex", flexDirection: "column", alignItems: "center"
   },
-
-  ipoImage: {
-    width: "70px",
-    height: "70px",
-    background: "#cce1d2",
-    borderRadius: "50%",
-    marginBottom: "10px",
-    border: "2px solid white",
-  },
-
-  ipoName: {
-    fontSize: "14px",
-    fontWeight: "600",
-    color: "white",
-  },
-
+  ipoImage: { width: "70px", height: "70px", background: "#cce1d2", borderRadius: "50%", marginBottom: "10px" },
   popupOverlay: {
-    position: "fixed",
-    top: 0,
-    left: 0,
-    width: "100%",
-    height: "100%",
-    background: "rgba(0,0,0,0.5)",
-    display: "flex",
-    justifyContent: "center",
-    alignItems: "center",
-    zIndex: 1000,
+    position: "fixed", top: 0, left: 0, width: "100%", height: "100%",
+    background: "rgba(0,0,0,0.5)", display: "flex", justifyContent: "center", alignItems: "center", zIndex: 1000
   },
-
   popup: {
-    background: "white",
-    width: "420px",
-    maxHeight: "80vh",
-    overflowY: "auto",
-    padding: "30px",
-    borderRadius: "12px",
-    boxShadow: "0 4px 12px rgba(0,0,0,0.2)",
-    textAlign: "center",
+    background: "white", width: "420px", padding: "30px",
+    borderRadius: "12px", maxHeight: "80vh", overflowY: "auto", textAlign: "left"
   },
-
   closeBtn: {
-    marginTop: "20px",
-    padding: "10px 20px",
-    background: "#2f4f3e",
-    color: "white",
-    border: "none",
-    borderRadius: "6px",
-    cursor: "pointer",
-  },
+    marginTop: "20px", padding: "10px 20px",
+    background: "#2f4f3e", color: "white", borderRadius: "6px", cursor: "pointer"
+  }
 };
