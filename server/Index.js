@@ -1,6 +1,4 @@
 // ✅ Load variables from .env
-import { spawn } from "child_process";
-
 require("dotenv").config();
 
 const express = require("express");
@@ -8,13 +6,16 @@ const mysql = require("mysql2");
 const cors = require("cors");
 const { OAuth2Client } = require("google-auth-library");
 
+// ⭐ ADD THIS (Required for Python execution)
+const { spawn } = require("child_process");
+
 // ✅ REQUIRED if Node < 18
 const fetch = (...args) =>
   import("node-fetch").then(({ default: fetch }) => fetch(...args));
 
 const app = express();
 
-/* ✅ ✅ ✅ CORS — ALLOW FRONTEND */
+/* FRONTEND */
 app.use(
   cors({
     origin: "http://localhost:3000",
@@ -23,27 +24,6 @@ app.use(
 );
 
 app.use(express.json());
-
-/* ❌❌❌ COMMENTED: OVERLAPPING SENSEX / GRAPH API ❌❌❌
-   Reason:
-   - Sensex + chart data is handled by Flask (Python)
-   - This route was conflicting and returning wrong data format
-*/
-
-// app.get("/api/sensex", async (req, res) => {
-//   try {
-//     const url = `https://eodhd.com/api/eod/AAPL.US?api_token=693845dbec47f2.81582732&fmt=json`;
-
-//     const response = await fetch(url);
-//     const data = await response.json();
-
-//     // ❌ Not Sensex + wrong format for chart
-//     res.json(data[0]);
-//   } catch (error) {
-//     console.error("❌ Sensex API Error:", error);
-//     res.status(500).json({ error: "Sensex fetch failed" });
-//   }
-// });
 
 /* ✅ GOOGLE CLIENT */
 const client = new OAuth2Client(process.env.GOOGLE_CLIENT_ID);
@@ -92,7 +72,112 @@ app.post("/google-login", async (req, res) => {
   }
 });
 
-/* ✅ ✅ ✅ START SERVER */
+/* IPO RISK API (Python ML Engine) */
+
+app.post("/api/risk", (req, res) => {
+  try {
+    const python = spawn(
+      "/Users/heshashah/stockai/server/venv/bin/python3",
+      ["ipo_risk_api.py"],
+      { cwd: __dirname }
+    );
+
+    // send frontend payload to Python
+    python.stdin.write(JSON.stringify(req.body));
+    python.stdin.end();
+
+    let output = "";
+
+    python.stdout.on("data", (data) => {
+      output += data.toString();
+    });
+
+    python.on("close", () => {
+      try {
+        const result = JSON.parse(output);
+        res.json(result);
+      } catch (error) {
+        console.error("❌ Python output error:", error);
+        res.status(500).json({ error: "ML Engine Failed" });
+      }
+    });
+  } catch (error) {
+    console.error("❌ Node Risk API error:", error);
+    res.status(500).json({ error: "Server error" });
+  }
+});
+
+/* IPO DETAILS API (IPOWatch + Yahoo Finance) */
+
+app.get("/api/ipo", async (req, res) => {
+  const key = req.query.key;
+
+  if (!key) return res.status(400).json({ error: "Missing key" });
+
+  // Load IPO list
+  const path = require("path");
+  const ipoList = require(path.join(__dirname, "ipo_list.json"));
+
+
+  if (!ipoList[key])
+    return res.status(404).json({ error: "Invalid IPO key" });
+
+  const ipoName = ipoList[key];
+
+  try {
+    // Call Python script
+    const { spawn } = require("child_process");
+    const py = spawn("/Library/Frameworks/Python.framework/Versions/3.12/bin/python3.12", ["get_ipo_data.py"]);
+
+
+    py.stdin.write(JSON.stringify({ key: req.query.key }));
+    py.stdin.end();
+
+    let data = "";
+
+    py.stdout.on("data", (chunk) => (data += chunk));
+
+    py.stdout.on("end", () => {
+      if (!data || data.trim() === "") {
+        console.error("❌ Python returned empty output");
+        return res.json({
+          ipowatch: { error: "No data from Python" },
+          market: {}
+        });
+      }
+
+      let ipowatchData;
+      try {
+        ipowatchData = JSON.parse(data);
+      } catch (err) {
+        console.error("❌ JSON parse failed:", data);
+        return res.json({
+          ipowatch: { error: "Invalid JSON from Python" },
+          market: {}
+        });
+      }
+
+      // MARKET DATA (dummy for now – add later)
+      const marketData = {
+        market_price: Math.floor(Math.random() * 500),
+        market_cap: Math.floor(Math.random() * 10000) + " Cr",
+        last_quarter_revenue: Math.floor(Math.random() * 1000) + " Cr",
+        sector: "Technology",
+        industry: "Software Services"
+      };
+
+      return res.json({
+        ipowatch: ipowatchData,
+        market: marketData
+      });
+    });
+
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+/* START SERVER */
 const PORT = process.env.PORT || 5001;
 app.listen(PORT, () => {
   console.log(`✅ Server running on http://localhost:${PORT}`);

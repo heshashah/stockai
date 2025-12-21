@@ -11,7 +11,12 @@ function Dashboard() {
         <h3 style={styles.logo}>StockAI</h3>
 
         <div style={styles.navLinks}>
-          <span style={styles.link}>Dashboard</span>
+          <span 
+            style={styles.link}
+            onClick={() => navigate("/dashboard")}
+          >
+            Dashboard
+          </span>
 
           {/* ✅ THIS NOW REDIRECTS */}
           {/* <span
@@ -26,6 +31,13 @@ function Dashboard() {
             onClick={() => navigate("/sensex")}
           >
             Sensex
+          </span>
+
+          <span
+            style={styles.link}
+            onClick={() => navigate("/risk")}
+          >
+            Risk
           </span>
 
           <span style={styles.link}>Industries</span>

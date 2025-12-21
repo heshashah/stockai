@@ -34,11 +34,17 @@ function Information() {
             Sensex
           </span>
 
+           <span
+            style={styles.link}
+            onClick={() => navigate("/risk")}
+          >
+            Risk
+          </span>
+
           <span style={styles.link}>Industries</span>
           <span style={styles.link}>People</span>
           <span style={styles.link}>Insights</span>
 
-          {/* ✅ ACTIVE PAGE */}
           <span
             style={styles.link}
             onClick={() => navigate("/information")}

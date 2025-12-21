@@ -8,6 +8,7 @@ import Dashboard from "./Dashboard";
 import Information from "./Information";
 //import Update from "./Update";
 import SensexChart from "./SensexChart";
+import RiskDashboard from "./RiskDashboard";
 
 const root = ReactDOM.createRoot(document.getElementById("root"));
 
@@ -20,6 +21,7 @@ root.render(
         <Route path="/information" element={<Information />} />
         {/* <Route path="/update" element={<Update />} /> */}
         <Route path="/sensex" element={<SensexChart />} />
+        <Route path="/risk" element={<RiskDashboard />} />
       </Routes>
     </BrowserRouter>
   </GoogleOAuthProvider>
