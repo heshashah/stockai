@@ -9,7 +9,7 @@ export default function RiskDashboard() {
   const [ipoData, setIpoData] = useState(null);
   const [loadingIPO, setLoadingIPO] = useState(false);
 
-  const [aiData, setAiData] = useState(null);   // ✅ Correct place
+  const [aiData, setAiData] = useState(null);
 
   const navigate = useNavigate();
 
@@ -62,9 +62,7 @@ export default function RiskDashboard() {
     setAiData(null);
   };
 
-  // ------------------------
-  // FETCH AI RISK ANALYSIS AFTER IPO DATA ARRIVES
-  // ------------------------
+  // FETCH AI ANALYSIS AFTER IPO DATA ARRIVES
   useEffect(() => {
     if (!ipoData) return;
 
@@ -73,7 +71,7 @@ export default function RiskDashboard() {
       financial_ratio: Math.random(),
       subscription: Math.random(),
       peer_strength: Math.random(),
-      prices: [100, 102, 98, 101, 99, 105]
+      prices: [100, 102, 98, 101, 99, 105],
     };
 
     axios
@@ -85,18 +83,42 @@ export default function RiskDashboard() {
   return (
     <div style={styles.page}>
 
-      {/* ---------------- NAVBAR ---------------- */}
+      {/* ✅ NEW NAVBAR INSERTED HERE */}
       <div style={styles.navbar}>
         <h3 style={styles.logo}>StockAI</h3>
 
         <div style={styles.navLinks}>
-          <span style={styles.link} onClick={() => navigate("/dashboard")}>Dashboard</span>
-          <span style={styles.link} onClick={() => navigate("/sensex")}>Sensex</span>
-          <span style={styles.link} onClick={() => navigate("/risk")}>Risk</span>
+          <span 
+            style={styles.link}
+            onClick={() => navigate("/dashboard")}
+          >
+            Dashboard
+          </span>
+
+          <span
+            style={styles.link}
+            onClick={() => navigate("/sensex")}
+          >
+            Sensex
+          </span>
+
+          <span
+            style={styles.link}
+            onClick={() => navigate("/risk")}
+          >
+            Risk
+          </span>
+
           <span style={styles.link}>Industries</span>
           <span style={styles.link}>People</span>
           <span style={styles.link}>Insights</span>
-          <span style={styles.link} onClick={() => navigate("/information")}>Information</span>
+
+          <span
+            style={styles.link}
+            onClick={() => navigate("/information")}
+          >
+            Information
+          </span>
         </div>
 
         <div>
@@ -104,8 +126,9 @@ export default function RiskDashboard() {
           <button style={styles.contactBtn}>Contact us</button>
         </div>
       </div>
+      {/* ✅ NEW NAVBAR ENDS */}
 
-      {/* ---------------- BODY ---------------- */}
+      {/* BODY */}
       <div style={styles.body}>
         <h1 style={{ marginTop: "40px", fontSize: "28px" }}>Available IPOs</h1>
 
@@ -119,7 +142,7 @@ export default function RiskDashboard() {
         </div>
       </div>
 
-      {/* ---------------- POPUP ---------------- */}
+      {/* POPUP */}
       {showPopup && selectedIPO && (
         <div style={styles.popupOverlay}>
           <div style={styles.popup}>
@@ -127,7 +150,6 @@ export default function RiskDashboard() {
 
             {loadingIPO && <p>Loading IPO details...</p>}
 
-            {/* IPOWATCH + MARKET DATA */}
             {ipoData && (
               <>
                 <h3>📌 IPOWatch Data</h3>
@@ -147,7 +169,6 @@ export default function RiskDashboard() {
               </>
             )}
 
-            {/* ---------------- AI ANALYSIS ---------------- */}
             {aiData && (
               <>
                 <hr />
@@ -160,10 +181,10 @@ export default function RiskDashboard() {
 
                 <p style={{ fontWeight: "bold", marginTop: "10px" }}>
                   {aiData.risk_score < 0.4
-                    ? "🟢 Suggested: Low Risk — Good Buy"
+                    ? "🟢 Low Risk — Good Buy"
                     : aiData.risk_score < 0.7
-                      ? "🟡 Suggested: Medium Risk — Be Cautious"
-                      : "🔴 Suggested: High Risk — Avoid"}
+                      ? "🟡 Medium Risk — Caution"
+                      : "🔴 High Risk — Avoid"}
                 </p>
               </>
             )}
