@@ -97,14 +97,27 @@ export default function SensexChart() {
             Risk
           </span>
 
-          <span style={styles.link}>Industries</span>
-          <span style={styles.link}>People</span>
-          <span style={styles.link}>Insights</span>
+             <span
+            style={styles.link}
+            onClick={() => navigate("/sentiment")}
+          >
+            Sentiment
+          </span>
+
+          {/* <span style={styles.link}>People</span>
+          <span style={styles.link}>Insights</span> */}
            <span
             style={styles.link}
             onClick={() => navigate("/information")}
           >
             Information
+          </span>
+
+          <span 
+            style={styles.link} 
+            onClick={() => navigate("/news")}
+          >
+            News
           </span>
         </div>
 

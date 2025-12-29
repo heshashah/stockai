@@ -88,7 +88,7 @@ export default function RiskDashboard() {
         <h3 style={styles.logo}>StockAI</h3>
 
         <div style={styles.navLinks}>
-          <span 
+          <span
             style={styles.link}
             onClick={() => navigate("/dashboard")}
           >
@@ -109,15 +109,28 @@ export default function RiskDashboard() {
             Risk
           </span>
 
-          <span style={styles.link}>Industries</span>
-          <span style={styles.link}>People</span>
-          <span style={styles.link}>Insights</span>
+          <span
+            style={styles.link}
+            onClick={() => navigate("/sentiment")}
+          >
+            Sentiment
+          </span>
+
+          {/* <span style={styles.link}>People</span>
+          <span style={styles.link}>Insights</span> */}
 
           <span
             style={styles.link}
             onClick={() => navigate("/information")}
           >
             Information
+          </span>
+
+          <span 
+            style={styles.link} 
+            onClick={() => navigate("/news")}
+          >
+            News
           </span>
         </div>
 
@@ -158,6 +171,27 @@ export default function RiskDashboard() {
                 <p><b>Listing Gain:</b> {ipoData.ipowatch?.listing_gain}</p>
                 <p><b>IPO Type:</b> {ipoData.ipowatch?.ipo_type}</p>
 
+                {/* ⭐ SENTIMENT PREVIEW ADDED HERE */}
+                <h3 style={{ marginTop: "15px" }}>🧠 Sentiment (AI)</h3>
+
+                <div>
+                  <span style={{ fontWeight: "bold" }}>Sentiment:</span>{" "}
+                  <span
+                    style={{
+                      color:
+                        ipoData.sentiment === "Positive"
+                          ? "green"
+                          : ipoData.sentiment === "Negative"
+                            ? "red"
+                            : "orange",
+                    }}
+                  >
+                    {ipoData.sentiment}
+                  </span>
+                </div>
+
+                <p><b>Sentiment Score:</b> {ipoData.sentiment_score}</p>
+                
                 <hr />
 
                 <h3>📌 Market Data</h3>
