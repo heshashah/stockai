@@ -1,29 +1,27 @@
-// Load .env first
-require("dotenv").config();
+// Load .env for ES modules
+import dotenv from "dotenv";
+dotenv.config();
 
-const express = require("express");
-const mysql = require("mysql2");
-const cors = require("cors");
-const { OAuth2Client } = require("google-auth-library");
-const { spawn } = require("child_process");
+// Imports
+import express from "express";
+import mysql from "mysql2";
+import cors from "cors";
+import { OAuth2Client } from "google-auth-library";
+import { spawn } from "child_process";
+import path from "path";
+import { fileURLToPath } from "url";
+
+
+// For __dirname in ES Modules
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 // Groq SDK
-const Groq = require("groq-sdk");
+import Groq from "groq-sdk";
 const groq = new Groq({ apiKey: process.env.GROQ_API_KEY });
 
-// ✅ CREATE APP — MUST COME BEFORE app.use()
+// Express App
 const app = express();
-
-/* FRONTEND CONFIG */
-app.use(
-  cors({
-    origin: "http://localhost:3000",
-    methods: ["GET", "POST"],
-  })
-);
-
-app.use(express.json());
-
 
 /* ---------------------------------------
    FRONTEND CONFIG
@@ -40,8 +38,17 @@ app.use(express.json());
 /* ---------------------------------------
    LOAD ROUTES
 ----------------------------------------- */
-const sentimentRoutes = require("./sentimentRoute");
-app.use("/api", sentimentRoutes); // <-- THIS IS CORRECT ROUTE MOUNTING
+import sentimentRoutes from "./sentimentRoute.js";
+app.use("/api", sentimentRoutes);
+
+import niftyRoute from "./routes/niftyRoute.js";
+app.use("/api/nifty", niftyRoute);
+
+import newsRoute from "./newsRoute.js";
+app.use("/api/news", newsRoute);
+
+import sensexRoute from "./routes/sensexRoute.js";
+app.use("/api/sensex", sensexRoute);
 
 /* ---------------------------------------
    GOOGLE LOGIN SETUP
@@ -131,23 +138,24 @@ app.post("/api/risk", (req, res) => {
 });
 
 /* ---------------------------------------
-   IPO DETAILS API (GROQ AI + Sentiment)
+   IPO DETAILS API (GROQ + Sentiment)
 ----------------------------------------- */
 app.get("/api/ipo", async (req, res) => {
   const key = req.query.key;
 
   if (!key) return res.status(400).json({ error: "Missing key" });
 
-  const path = require("path");
-  const ipoList = require(path.join(__dirname, "ipo_list.json"));
+  const ipoList = await import("./ipo_list.json", {
+    assert: { type: "json" },
+  });
 
-  if (!ipoList[key])
+  if (!ipoList.default[key])
     return res.status(404).json({ error: "Invalid IPO key" });
 
+  const ipoName = ipoList.default[key];
+
   try {
-    /* ------------------------------
-       1️⃣ Fetch IPOWatch data
-    ------------------------------ */
+    /* 1️⃣ Fetch IPOWatch data */
     const py1 = spawn(
       "/Library/Frameworks/Python.framework/Versions/3.12/bin/python3.12",
       ["get_ipo_data.py"]
@@ -164,23 +172,16 @@ app.get("/api/ipo", async (req, res) => {
       try {
         ipowatchData = JSON.parse(ipoOutput);
       } catch (err) {
-        return res.json({
-          error: "Invalid IPOWatch output",
-          raw: ipoOutput,
-        });
+        return res.json({ error: "Invalid IPOWatch output", raw: ipoOutput });
       }
 
-      /* ------------------------------
-         2️⃣ Generate AI Headlines (Groq)
-      ------------------------------ */
-      const ipoName = ipoList[key];
-
+      /* 2️⃣ Generate AI Headlines (Groq) */
       const prompt = `
 Generate 3 realistic and unique news headlines about the IPO "${ipoName}".
-- One should be positive.
-- One should be negative.
-- One should be neutral.
-- Output ONLY a JSON array of 3 strings.
+- One positive
+- One negative
+- One neutral
+Output ONLY a JSON array.
 `;
 
       let aiHeadlines = [];
@@ -188,25 +189,19 @@ Generate 3 realistic and unique news headlines about the IPO "${ipoName}".
       try {
         const response = await groq.chat.completions.create({
           model: "llama-3.3-70b-versatile",
-          messages: [
-            { role: "user", content: prompt }
-          ]
-          // temperature: 0.9,
+          messages: [{ role: "user", content: prompt }],
         });
 
         aiHeadlines = JSON.parse(response.choices[0].message.content);
       } catch (err) {
-        console.log("GROQ AI ERROR:", err);
         aiHeadlines = [
           `${ipoName} IPO opens for subscription`,
           `${ipoName} IPO receives mixed investor sentiment`,
-          `Analysts evaluate listing expectations for ${ipoName}`,
+          `${ipoName} IPO sees cautious demand`,
         ];
       }
 
-      /* ------------------------------
-         3️⃣ Run Sentiment analysis
-      ------------------------------ */
+      /* 3️⃣ Run sentiment analysis */
       const py2 = spawn(
         "/Users/heshashah/stockai/venv/bin/python3",
         ["/Users/heshashah/stockai/python/ipo_sentiment.py"],
@@ -231,20 +226,16 @@ Generate 3 realistic and unique news headlines about the IPO "${ipoName}".
           };
         }
 
-        /* ------------------------------
-           4️⃣ Prepare market data
-        ------------------------------ */
+        /* 4️⃣ Prepare dummy market data */
         const market = {
           market_price: Math.floor(Math.random() * 500),
-          market_cap: Math.floor(Math.random() * 10000) + " Cr",
-          last_quarter_revenue: Math.floor(Math.random() * 1000) + " Cr",
+          market_cap: `${Math.floor(Math.random() * 10000)} Cr`,
+          last_quarter_revenue: `${Math.floor(Math.random() * 1000)} Cr`,
           sector: "Technology",
           industry: "Software Services",
         };
 
-        /* ------------------------------
-           5️⃣ Final JSON response
-        ------------------------------ */
+        /* 5️⃣ Final Response */
         res.json({
           ipowatch: ipowatchData,
           market,
@@ -288,21 +279,20 @@ app.post("/api/ipo/ai", (req, res) => {
   });
 });
 
-/* ------------------------------
-        News API ROUTE
------------------------------- */
-const newsRoute = require("./newsRoute");
-app.use("/api/news", newsRoute);
+import sectorRoute from "./routes/sectorRoute.js";
+app.use("/api", sectorRoute);
 
+/* ---------------------------------------
+   TEST ROUTE
+----------------------------------------- */
 app.get("/test", (req, res) => {
-  console.log("✔ Test route hit");
   res.send("Backend is working");
 });
 
 /* ---------------------------------------
    START SERVER
 ----------------------------------------- */
-const PORT = process.env.PORT || 5001;
+const PORT = process.env.PORT || 5002;
 app.listen(PORT, () => {
-  console.log(`✅ Server running on http://localhost:${PORT}`);
+  console.log(`🚀 Server running at http://localhost:${PORT}`);
 });

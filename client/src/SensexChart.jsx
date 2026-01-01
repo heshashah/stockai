@@ -24,7 +24,7 @@ export default function SensexChart() {
         setLoading(true);
 
         const res = await axios.get(
-          `http://localhost:5002/api/sensex?range=${range}`
+          `http://localhost:5001/api/sensex?range=${range}`
         );
 
         const result = res.data.chart?.result?.[0];

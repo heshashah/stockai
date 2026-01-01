@@ -3,7 +3,7 @@ import ReactDOM from "react-dom/client";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { GoogleOAuthProvider } from "@react-oauth/google";
 import Login from "./Login";
-import Dashboard from "./Dashboard";
+import Dashboard from "./components/Dashboard/Dashboard";
 import Information from "./Information";
 //import Update from "./Update";
 import SensexChart from "./SensexChart";

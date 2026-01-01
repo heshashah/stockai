@@ -1,0 +1,9 @@
+[
+  { "sector": "Technology", "performance": 1.24 },
+  { "sector": "Healthcare", "performance": -0.42 },
+  { "sector": "Financial Services", "performance": 0.78 },
+  { "sector": "Energy", "performance": -0.22 },
+  { "sector": "Consumer Goods", "performance": 0.41 },
+  { "sector": "Real Estate", "performance": -0.30 },
+  { "sector": "Utilities", "performance": 0.15 }
+]
