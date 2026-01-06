@@ -17,6 +17,8 @@ const __dirname = path.dirname(__filename);
 import Groq from "groq-sdk";
 const groq = new Groq({ apiKey: process.env.GROQ_API_KEY });
 
+console.log("FMP_API_KEY =", process.env.FMP_API_KEY);
+
 const app = express();
 
 /* FRONTEND CONFIG */
@@ -50,6 +52,9 @@ app.use("/", ipoRoute);
 
 import aiPicksRoute from "./routes/aiPicksRoute.js";
 app.use("/api/ai-picks", aiPicksRoute);
+
+import stockDirectionRoute from "./routes/stockDirectionRoute.js";
+app.use("/api/direction", stockDirectionRoute);
 
 /* GOOGLE LOGIN SETUP */
 const client = new OAuth2Client(process.env.GOOGLE_CLIENT_ID);
@@ -94,6 +99,53 @@ app.post("/google-login", async (req, res) => {
     );
   } catch (error) {
     res.status(401).json({ error: "Invalid token" });
+  }
+});
+
+/* -------------------------------------------------
+   ✅ NEW MODULE: PEER COMPARISON AI ENGINE
+--------------------------------------------------*/
+app.post("/api/peer-ai", (req, res) => {
+  try {
+    const python = spawn(
+      "/Users/heshashah/stockai/server/venv/bin/python3",
+      ["ai/peer_ai.py"],
+      { cwd: __dirname }
+    );
+
+    python.stdin.write(JSON.stringify(req.body));
+    python.stdin.end();
+
+    let output = "";
+
+    python.stdout.on("data", (data) => {
+      output += data.toString();
+    });
+
+    python.stderr.on("data", (data) => {
+      console.error("🐍 Python error:", data.toString());
+    });
+
+    python.on("close", () => {
+      if (!output) {
+        return res.status(500).json({ error: "Python returned no output" });
+      }
+
+      try {
+        const result = JSON.parse(output);
+        res.json(result);
+      } catch (error) {
+        console.error("❌ Peer AI JSON parse error:", output);
+        res.status(500).json({
+          error: "Invalid AI response",
+          raw: output
+        });
+      }
+    });
+
+  } catch (error) {
+    console.error("❌ Peer AI Node error:", error);
+    res.status(500).json({ error: "Server error" });
   }
 });
 
@@ -268,9 +320,14 @@ app.post("/api/ipo/ai", (req, res) => {
   });
 });
 
-import stockDirectionRoute from "./routes/stockDirectionRoute.js";
-app.use("/api/direction", stockDirectionRoute);
+import peerDynamicRoute from "./routes/peerDynamicRoute.js";
+app.use("/api/peer-dynamic", peerDynamicRoute);
 
+import peerAlphaRoute from "./routes/peerAlphaRoute.js";
+app.use("/api/peer-alpha", peerAlphaRoute);
+
+
+/* ROOT */
 app.get("/", (req, res) => {
   res.json({
     service: "StockAI Backend",
@@ -285,7 +342,8 @@ app.get("/test", (req, res) => {
 });
 
 /* START SERVER */
-const PORT = process.env.PORT || 5002;
+const PORT = process.env.PORT || 5001;
 app.listen(PORT, () => {
   console.log(`🚀 Server running at http://localhost:${PORT}`);
 });
+

@@ -40,7 +40,8 @@ function StockDirection() {
           <span style={styles.link} onClick={() => navigate("/direction")}>Direction</span>
           <span style={styles.link} onClick={() => navigate("/risk")}>Risk</span>
           {/* <span style={styles.link} onClick={() => navigate("/sentiment")}>Sentiment</span> */}
-          <span style={styles.link} onClick={() => navigate("/stock-direction")}>Direction</span>
+          <span style={styles.link} onClick={() => navigate("/peer-comparison")}>Comparison</span>
+          <span style={styles.link} onClick={() => navigate("/information")}>Information</span>
           <span style={styles.link} onClick={() => navigate("/news")}>News</span>
         </div>
 

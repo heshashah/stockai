@@ -11,6 +11,7 @@ import RiskDashboard from "./RiskDashboard";
 import SentimentAnalysis from "./pages/SentimentAnalysis";
 import NewsPage from "./pages/NewsPage";
 import StockDirection from "./pages/StockDirection";
+import PeerComparisonAI from "./pages/PeerComparisonAI";
 
 const root = ReactDOM.createRoot(document.getElementById("root"));
 
@@ -28,6 +29,8 @@ root.render(
         <Route path="/news" element={<NewsPage />} />
         <Route path="/direction" element={<StockDirection />} />
         <Route path="/sentiment/:ipoKey" element={<SentimentAnalysis />} />
+        {/* <Route path="/peer-comparison" element={<PeerComparisonAI />} /> */}
+        <Route path="/peer-comparison" element={<PeerComparisonAI />} />
       </Routes>
     </BrowserRouter>
   </GoogleOAuthProvider>

@@ -1,0 +1,5 @@
+{
+  "IT": ["TCS", "Infosys", "Wipro", "HCL Tech", "Tech Mahindra"],
+  "Banking": ["HDFC Bank", "ICICI Bank", "SBI", "Axis Bank", "Kotak Bank"],
+  "Seafood": ["Apex Frozen", "Kings Infra", "Essex Marine", "Zeal Aqua", "Waterbase", "Coastal Corp"]
+}
