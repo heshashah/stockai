@@ -1,0 +1,32 @@
+def predict_direction(indicators):
+    score = 0
+    reasons = []
+
+    if indicators["ma_short"] > indicators["ma_long"]:
+        score += 25
+        reasons.append("Short-term MA is above long-term MA")
+
+    if 50 <= indicators["rsi"] <= 70:
+        score += 25
+        reasons.append("RSI shows healthy momentum")
+
+    if indicators["macd"] > indicators["signal"]:
+        score += 25
+        reasons.append("MACD is positive")
+
+    if indicators["volume_change"] > 0:
+        score += 25
+        reasons.append("Volume is increasing")
+
+    if score >= 75:
+        direction = "BULLISH"
+    elif score <= 25:
+        direction = "BEARISH"
+    else:
+        direction = "SIDEWAYS"
+
+    return {
+        "direction": direction,
+        "confidence": score,
+        "reasons": reasons
+    }

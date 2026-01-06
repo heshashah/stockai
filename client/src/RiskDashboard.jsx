@@ -88,50 +88,13 @@ export default function RiskDashboard() {
         <h3 style={styles.logo}>StockAI</h3>
 
         <div style={styles.navLinks}>
-          <span
-            style={styles.link}
-            onClick={() => navigate("/dashboard")}
-          >
-            Dashboard
-          </span>
-
-          <span
-            style={styles.link}
-            onClick={() => navigate("/sensex")}
-          >
-            Sensex
-          </span>
-
-          <span
-            style={styles.link}
-            onClick={() => navigate("/risk")}
-          >
-            Risk
-          </span>
-
-          <span
-            style={styles.link}
-            onClick={() => navigate("/sentiment")}
-          >
-            Sentiment
-          </span>
-
-          {/* <span style={styles.link}>People</span>
-          <span style={styles.link}>Insights</span> */}
-
-          <span
-            style={styles.link}
-            onClick={() => navigate("/information")}
-          >
-            Information
-          </span>
-
-          <span 
-            style={styles.link} 
-            onClick={() => navigate("/news")}
-          >
-            News
-          </span>
+          <span style={styles.link} onClick={() => navigate("/dashboard")}>Dashboard</span>
+          {/* <span style={styles.link} onClick={() => navigate("/sensex")}>Sensex</span> */}
+          <span style={styles.link} onClick={() => navigate("/direction")}>Direction</span>
+          <span style={styles.link} onClick={() => navigate("/risk")}>Risk</span>
+          {/* <span style={styles.link} onClick={() => navigate("/sentiment")}>Sentiment</span> */}
+          <span style={styles.link} onClick={() => navigate("/information")}>Information</span>
+          <span style={styles.link} onClick={() => navigate("/news")}>News</span>
         </div>
 
         <div>
@@ -156,78 +119,99 @@ export default function RiskDashboard() {
       </div>
 
       {/* POPUP */}
-      {showPopup && selectedIPO && (
-        <div style={styles.popupOverlay}>
-          <div style={styles.popup}>
-            <h2>{selectedIPO.name}</h2>
+      {
+        showPopup && selectedIPO && (
+          <div style={styles.popupOverlay}>
+            <div style={styles.popup}>
+              <h2>{selectedIPO.name}</h2>
 
-            {loadingIPO && <p>Loading IPO details...</p>}
+              {loadingIPO && <p>Loading IPO details...</p>}
 
-            {ipoData && (
-              <>
-                <h3>📌 IPOWatch Data</h3>
-                <p><b>GMP:</b> {ipoData.ipowatch?.gmp}</p>
-                <p><b>IPO Price:</b> {ipoData.ipowatch?.ipo_price}</p>
-                <p><b>Listing Gain:</b> {ipoData.ipowatch?.listing_gain}</p>
-                <p><b>IPO Type:</b> {ipoData.ipowatch?.ipo_type}</p>
+              {ipoData && (
+                <>
+                  <h3>📌 IPOWatch Data</h3>
+                  <p><b>GMP:</b> {ipoData.ipowatch?.gmp}</p>
+                  <p><b>IPO Price:</b> {ipoData.ipowatch?.ipo_price}</p>
+                  <p><b>Listing Gain:</b> {ipoData.ipowatch?.listing_gain}</p>
+                  <p><b>IPO Type:</b> {ipoData.ipowatch?.ipo_type}</p>
 
-                {/* ⭐ SENTIMENT PREVIEW ADDED HERE */}
-                <h3 style={{ marginTop: "15px" }}>🧠 Sentiment (AI)</h3>
+                  {/* ⭐ SENTIMENT PREVIEW ADDED HERE */}
+                  {/* <h3 style={{ marginTop: "15px" }}>🧠 Sentiment (AI)</h3>
 
-                <div>
-                  <span style={{ fontWeight: "bold" }}>Sentiment:</span>{" "}
-                  <span
-                    style={{
-                      color:
-                        ipoData.sentiment === "Positive"
-                          ? "green"
-                          : ipoData.sentiment === "Negative"
-                            ? "red"
-                            : "orange",
-                    }}
-                  >
-                    {ipoData.sentiment}
-                  </span>
-                </div>
+              <div>
+                <span style={{ fontWeight: "bold" }}>Sentiment:</span>{" "}
+                <span
+                  style={{
+                    color:
+                      ipoData.sentiment === "Positive"
+                        ? "green"
+                        : ipoData.sentiment === "Negative"
+                          ? "red"
+                          : "orange",
+                  }}
+                >
+                  {ipoData.sentiment}
+                </span>
+              </div>
 
-                <p><b>Sentiment Score:</b> {ipoData.sentiment_score}</p>
-                
-                <hr />
+              <p><b>Sentiment Score:</b> {ipoData.sentiment_score}</p> */}
 
-                <h3>📌 Market Data</h3>
-                <p><b>Market Price:</b> {ipoData.market?.market_price}</p>
-                <p><b>Market Cap:</b> {ipoData.market?.market_cap}</p>
-                <p><b>Last Quarter Revenue:</b> {ipoData.market?.last_quarter_revenue}</p>
-                <p><b>Sector:</b> {ipoData.market?.sector}</p>
-                <p><b>Industry:</b> {ipoData.market?.industry}</p>
-              </>
-            )}
+                  <hr />
 
-            {aiData && (
-              <>
-                <hr />
-                <h3>🤖 AI Risk Analysis</h3>
+                  <h3>📌 Market Data</h3>
+                  <p><b>Market Price:</b> {ipoData.market?.market_price}</p>
+                  <p><b>Market Cap:</b> {ipoData.market?.market_cap}</p>
+                  <p><b>Last Quarter Revenue:</b> {ipoData.market?.last_quarter_revenue}</p>
+                  <p><b>Sector:</b> {ipoData.market?.sector}</p>
+                  <p><b>Industry:</b> {ipoData.market?.industry}</p>
+                </>
+              )}
 
-                <p><b>Risk Score:</b> {aiData.risk_score}</p>
-                <p><b>Volatility:</b> {aiData.volatility}</p>
-                <p><b>Logistic Score:</b> {aiData.logistic}</p>
-                <p><b>Random Forest Score:</b> {aiData.random_forest}</p>
+              {aiData && (
+                <>
+                  <hr />
+                  <h3>🤖 AI Risk Analysis</h3>
 
-                <p style={{ fontWeight: "bold", marginTop: "10px" }}>
-                  {aiData.risk_score < 0.4
-                    ? "🟢 Low Risk — Good Buy"
-                    : aiData.risk_score < 0.7
-                      ? "🟡 Medium Risk — Caution"
-                      : "🔴 High Risk — Avoid"}
-                </p>
-              </>
-            )}
+                  <p><b>Risk Score:</b> {aiData.risk_score}</p>
+                  <p><b>Volatility:</b> {aiData.volatility}</p>
+                  <p><b>Logistic Score:</b> {aiData.logistic}</p>
+                  <p><b>Random Forest Score:</b> {aiData.random_forest}</p>
 
-            <button style={styles.closeBtn} onClick={closePopup}>Close</button>
+                  <p style={{ fontWeight: "bold", marginTop: "10px" }}>
+                    {aiData.risk_score < 0.4
+                      ? "🟢 Low Risk — Good Buy"
+                      : aiData.risk_score < 0.7
+                        ? "🟡 Medium Risk — Caution"
+                        : "🔴 High Risk — Avoid"}
+                  </p>
+                </>
+              )}
+
+              {/* 🔗 LINK TO SENTIMENT PAGE */}
+              <button
+                style={{
+                  marginTop: "10px",
+                  marginRight: "10px",
+                  padding: "8px 16px",
+                  background: "#f4f6f5",
+                  border: "1px solid #2f4f3e",
+                  color: "#2f4f3e",
+                  borderRadius: "6px",
+                  cursor: "pointer",
+                  fontWeight: "600",
+                }}
+                onClick={() => navigate(`/sentiment/${selectedIPO.key}`)}
+
+              >
+                View Sentiment →
+              </button>
+
+              <button style={styles.closeBtn} onClick={closePopup}>Close</button>
+            </div>
           </div>
-        </div>
-      )}
-    </div>
+        )
+      }
+    </div >
   );
 }
 

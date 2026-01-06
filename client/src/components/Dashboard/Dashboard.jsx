@@ -5,9 +5,9 @@ import { useNavigate } from "react-router-dom";
 import MarketCards from "./MarketCards";
 import SensexChart from "./SensexChart";
 import TopGainersLosers from "../TopGainersLosers";
-import IPOMini from "./IPOMini";
-import AIPicksTable from "./AIPicksTable";
 import SectorPerformance from "../SectorPerformance";
+import IPOMini from "../IPOmini";
+import AIStockPicks from "../AIStockPicks";
 
 function Dashboard() {
   const navigate = useNavigate();
@@ -21,9 +21,10 @@ function Dashboard() {
 
         <div style={styles.navLinks}>
           <span style={styles.link} onClick={() => navigate("/dashboard")}>Dashboard</span>
-          <span style={styles.link} onClick={() => navigate("/sensex")}>Sensex</span>
+          {/* <span style={styles.link} onClick={() => navigate("/sensex")}>Sensex</span> */}
+          <span style={styles.link} onClick={() => navigate("/direction")}>Direction</span>
           <span style={styles.link} onClick={() => navigate("/risk")}>Risk</span>
-          <span style={styles.link} onClick={() => navigate("/sentiment")}>Sentiment</span>
+          {/* <span style={styles.link} onClick={() => navigate("/sentiment")}>Sentiment</span> */}
           <span style={styles.link} onClick={() => navigate("/information")}>Information</span>
           <span style={styles.link} onClick={() => navigate("/news")}>News</span>
         </div>
@@ -54,7 +55,7 @@ function Dashboard() {
         {/* 🔹 4 — IPO Section + AI Picks */}
         <div style={styles.twoCol}>
           <IPOMini />
-          <AIPicksTable />
+          <AIStockPicks />
         </div>
 
       </div>

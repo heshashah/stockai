@@ -6,10 +6,7 @@ from flask_cors import CORS
 app = Flask(__name__)
 CORS(app)
 
-
-# ----------------------------------
-# 🔥 FUNCTION 1: SCRAPE UPCOMING IPO
-# ----------------------------------
+# SCRAPE UPCOMING IPO
 def scrape_upcoming_ipos():
     url = "https://www.chittorgarh.com/ipo/upcoming-ipo-list/2/"
 
@@ -38,11 +35,7 @@ def scrape_upcoming_ipos():
 
     return ipo_list
 
-
-
-# -------------------------------------
-# 🔥 FUNCTION 2: SCRAPE GMP (Grey Market)
-# -------------------------------------
+# SCRAPE GMP (Grey Market)
 def scrape_gmp(ipo_name):
     url = "https://www.chittorgarh.com/report/latest-grey-market-premium-gmp/44/"
 
@@ -67,21 +60,13 @@ def scrape_gmp(ipo_name):
 
     return 0  # No GMP found
 
-
-
-# ------------------------------------------------------
-# 🔥 FUNCTION 3: IPO LISTING PRICE PREDICTION ALGORITHM
-# ------------------------------------------------------
+# IPO LISTING PRICE PREDICTION ALGORITHM
 def predict_listing_price(upper_price, gmp):
     predicted_price = upper_price + gmp
     gain_percent = (gmp / upper_price) * 100
     return round(predicted_price, 2), round(gain_percent, 2)
 
-
-
-# -----------------------------------
-# 🔥 MAIN API ENDPOINT (React Calls)
-# -----------------------------------
+# MAIN API ENDPOINT (React)
 @app.route("/ipo-predictions")
 def ipo_predictions():
 

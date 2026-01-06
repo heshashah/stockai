@@ -10,6 +10,7 @@ import SensexChart from "./SensexChart";
 import RiskDashboard from "./RiskDashboard";
 import SentimentAnalysis from "./pages/SentimentAnalysis";
 import NewsPage from "./pages/NewsPage";
+import StockDirection from "./pages/StockDirection";
 
 const root = ReactDOM.createRoot(document.getElementById("root"));
 
@@ -25,6 +26,8 @@ root.render(
         <Route path="/risk" element={<RiskDashboard />} />
         <Route path="/sentiment" element={<SentimentAnalysis />} />
         <Route path="/news" element={<NewsPage />} />
+        <Route path="/direction" element={<StockDirection />} />
+        <Route path="/sentiment/:ipoKey" element={<SentimentAnalysis />} />
       </Routes>
     </BrowserRouter>
   </GoogleOAuthProvider>

@@ -1,4 +1,4 @@
-// Load .env for ES modules
+// Load .env 
 import dotenv from "dotenv";
 dotenv.config();
 
@@ -11,21 +11,15 @@ import { spawn } from "child_process";
 import path from "path";
 import { fileURLToPath } from "url";
 
-
-// For __dirname in ES Modules
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
-// Groq SDK
 import Groq from "groq-sdk";
 const groq = new Groq({ apiKey: process.env.GROQ_API_KEY });
 
-// Express App
 const app = express();
 
-/* ---------------------------------------
-   FRONTEND CONFIG
------------------------------------------ */
+/* FRONTEND CONFIG */
 app.use(
   cors({
     origin: "http://localhost:3000",
@@ -35,10 +29,8 @@ app.use(
 
 app.use(express.json());
 
-/* ---------------------------------------
-   LOAD ROUTES
------------------------------------------ */
-import sentimentRoutes from "./sentimentRoute.js";
+/* LOAD ROUTES */
+import sentimentRoutes from "./routes/sentimentRoute.js";
 app.use("/api", sentimentRoutes);
 
 import niftyRoute from "./routes/niftyRoute.js";
@@ -50,14 +42,19 @@ app.use("/api/news", newsRoute);
 import sensexRoute from "./routes/sensexRoute.js";
 app.use("/api/sensex", sensexRoute);
 
-/* ---------------------------------------
-   GOOGLE LOGIN SETUP
------------------------------------------ */
+import sectorRoute from "./routes/sectorRoute.js";
+app.use("/api", sectorRoute);
+
+import ipoRoute from "./routes/ipoRoute.js";
+app.use("/", ipoRoute);
+
+import aiPicksRoute from "./routes/aiPicksRoute.js";
+app.use("/api/ai-picks", aiPicksRoute);
+
+/* GOOGLE LOGIN SETUP */
 const client = new OAuth2Client(process.env.GOOGLE_CLIENT_ID);
 
-/* ---------------------------------------
-   MYSQL CONNECTION
------------------------------------------ */
+/* MYSQL CONNECTION */
 const db = mysql.createConnection({
   host: process.env.DB_HOST,
   user: process.env.DB_USER,
@@ -73,9 +70,7 @@ db.connect((err) => {
   }
 });
 
-/* ---------------------------------------
-   GOOGLE LOGIN API
------------------------------------------ */
+/* GOOGLE LOGIN API */
 app.post("/google-login", async (req, res) => {
   try {
     const { token } = req.body;
@@ -102,9 +97,7 @@ app.post("/google-login", async (req, res) => {
   }
 });
 
-/* ---------------------------------------
-   IPO RISK API (PYTHON ML ENGINE)
------------------------------------------ */
+/* IPO RISK API (PYTHON ML ENGINE) */
 app.post("/api/risk", (req, res) => {
   try {
     const python = spawn(
@@ -137,9 +130,7 @@ app.post("/api/risk", (req, res) => {
   }
 });
 
-/* ---------------------------------------
-   IPO DETAILS API (GROQ + Sentiment)
------------------------------------------ */
+/* IPO DETAILS API (GROQ + Sentiment) */
 app.get("/api/ipo", async (req, res) => {
   const key = req.query.key;
 
@@ -155,7 +146,7 @@ app.get("/api/ipo", async (req, res) => {
   const ipoName = ipoList.default[key];
 
   try {
-    /* 1️⃣ Fetch IPOWatch data */
+    /* Fetch IPOWatch data */
     const py1 = spawn(
       "/Library/Frameworks/Python.framework/Versions/3.12/bin/python3.12",
       ["get_ipo_data.py"]
@@ -175,7 +166,7 @@ app.get("/api/ipo", async (req, res) => {
         return res.json({ error: "Invalid IPOWatch output", raw: ipoOutput });
       }
 
-      /* 2️⃣ Generate AI Headlines (Groq) */
+      /* Generate AI Headlines (Groq) */
       const prompt = `
 Generate 3 realistic and unique news headlines about the IPO "${ipoName}".
 - One positive
@@ -201,7 +192,7 @@ Output ONLY a JSON array.
         ];
       }
 
-      /* 3️⃣ Run sentiment analysis */
+      /* Run sentiment analysis */
       const py2 = spawn(
         "/Users/heshashah/stockai/venv/bin/python3",
         ["/Users/heshashah/stockai/python/ipo_sentiment.py"],
@@ -226,7 +217,7 @@ Output ONLY a JSON array.
           };
         }
 
-        /* 4️⃣ Prepare dummy market data */
+        /* Prepare dummy market data */
         const market = {
           market_price: Math.floor(Math.random() * 500),
           market_cap: `${Math.floor(Math.random() * 10000)} Cr`,
@@ -235,7 +226,7 @@ Output ONLY a JSON array.
           industry: "Software Services",
         };
 
-        /* 5️⃣ Final Response */
+        /* Final Response */
         res.json({
           ipowatch: ipowatchData,
           market,
@@ -251,9 +242,7 @@ Output ONLY a JSON array.
   }
 });
 
-/* ---------------------------------------
-   AI IPO RISK (TEXT ML)
------------------------------------------ */
+/* AI IPO RISK (TEXT ML) */
 app.post("/api/ipo/ai", (req, res) => {
   const python = spawn("python3", ["ipo_risk_api.py"]);
 
@@ -279,19 +268,23 @@ app.post("/api/ipo/ai", (req, res) => {
   });
 });
 
-import sectorRoute from "./routes/sectorRoute.js";
-app.use("/api", sectorRoute);
+import stockDirectionRoute from "./routes/stockDirectionRoute.js";
+app.use("/api/direction", stockDirectionRoute);
 
-/* ---------------------------------------
-   TEST ROUTE
------------------------------------------ */
+app.get("/", (req, res) => {
+  res.json({
+    service: "StockAI Backend",
+    status: "running",
+    port: 5001
+  });
+});
+
+/* TEST ROUTE */
 app.get("/test", (req, res) => {
   res.send("Backend is working");
 });
 
-/* ---------------------------------------
-   START SERVER
------------------------------------------ */
+/* START SERVER */
 const PORT = process.env.PORT || 5002;
 app.listen(PORT, () => {
   console.log(`🚀 Server running at http://localhost:${PORT}`);

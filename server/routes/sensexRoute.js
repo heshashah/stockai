@@ -3,12 +3,11 @@ import axios from "axios";
 
 const router = express.Router();
 
-// GET /api/sensex?range=1D or 1W or 1M
+// range=1D or 1W or 1M
 router.get("/", async (req, res) => {
   try {
     const range = req.query.range || "1D";
 
-    // Convert frontend ranges → Yahoo Finance ranges
     const yahooRanges = {
       "1D": "1d",
       "1W": "5d",

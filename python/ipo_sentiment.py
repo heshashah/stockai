@@ -45,3 +45,40 @@ if __name__ == "__main__":
     except Exception as e:
         print(json.dumps({"error": "PYTHON_CRASH", "message": str(e)}))
 
+
+input_data = json.loads(sys.stdin.read())
+news_list = input_data.get("news", [])
+
+details = []
+scores = []
+
+for headline in news_list:
+    analysis = TextBlob(headline)
+    score = analysis.sentiment.polarity
+    scores.append(score)
+
+    details.append({
+        "headline": headline,
+        "score": round(score, 3)
+    })
+
+if scores:
+    avg_score = sum(scores) / len(scores)
+else:
+    avg_score = 0
+
+if avg_score > 0.1:
+    sentiment = "Positive"
+elif avg_score < -0.1:
+    sentiment = "Negative"
+else:
+    sentiment = "Neutral"
+
+output = {
+    "overall_score": round(avg_score, 3),
+    "sentiment": sentiment,
+    "details": details
+}
+
+print(json.dumps(output))
+

@@ -1,0 +1,29 @@
+[
+  {
+    "name": "Tata Technologies IPO",
+    "price_band": "₹475 – ₹500",
+    "open_date": "2026-01-10",
+    "close_date": "2026-01-12",
+    "gmp": "₹150",
+    "predicted_listing_price": 650,
+    "expected_gain_percent": 30
+  },
+  {
+    "name": "Medi Assist IPO",
+    "price_band": "₹400 – ₹415",
+    "open_date": "2026-01-12",
+    "close_date": "2026-01-15",
+    "gmp": "₹80",
+    "predicted_listing_price": 500,
+    "expected_gain_percent": 20
+  },
+  {
+    "name": "IKIO Lighting IPO",
+    "price_band": "₹270 – ₹285",
+    "open_date": "2026-01-15",
+    "close_date": "2026-01-17",
+    "gmp": "₹70",
+    "predicted_listing_price": 345,
+    "expected_gain_percent": 22
+  }
+]

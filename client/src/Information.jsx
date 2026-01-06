@@ -11,58 +11,13 @@ function Information() {
         <h3 style={styles.logo}>StockAI</h3>
 
         <div style={styles.navLinks}>
-          {/* ✅ DASHBOARD REDIRECT */}
-          <span
-            style={styles.link}
-            onClick={() => navigate("/dashboard")}
-          >
-            Dashboard
-          </span>
-
-          {/* ✅ UPDATE REDIRECTS */}
-          {/* <span
-            style={styles.link}
-            onClick={() => navigate("/update")}
-          >
-            Daily Updates
-          </span> */}
-
-           <span
-            style={styles.link}
-            onClick={() => navigate("/sensex")}
-          >
-            Sensex
-          </span>
-
-           <span
-            style={styles.link}
-            onClick={() => navigate("/risk")}
-          >
-            Risk
-          </span>
-
-             <span
-            style={styles.link}
-            onClick={() => navigate("/sentiment")}
-          >
-            Sentiment
-          </span>
-
-          {/* <span style={styles.link}>People</span>
-          <span style={styles.link}>Insights</span> */}
-
-          <span
-            style={styles.link}
-            onClick={() => navigate("/information")}
-          >
-            Information
-          </span>
-
-          <span style={styles.link} 
-          onClick={() => navigate("/news")}>
-            News
-          </span>
-
+          <span style={styles.link} onClick={() => navigate("/dashboard")}>Dashboard</span>
+          {/* <span style={styles.link} onClick={() => navigate("/sensex")}>Sensex</span> */}
+          <span style={styles.link} onClick={() => navigate("/direction")}>Direction</span>
+          <span style={styles.link} onClick={() => navigate("/risk")}>Risk</span>
+          {/* <span style={styles.link} onClick={() => navigate("/sentiment")}>Sentiment</span> */}
+          <span style={styles.link} onClick={() => navigate("/information")}>Information</span>
+          <span style={styles.link} onClick={() => navigate("/news")}>News</span>
         </div>
 
         <div>
