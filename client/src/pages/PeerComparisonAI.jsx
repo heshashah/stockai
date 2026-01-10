@@ -43,11 +43,18 @@ export default function PeerComparison() {
 
         <div style={styles.navLinks}>
           <span style={styles.link} onClick={() => navigate("/dashboard")}>Dashboard</span>
+          {/* <span style={styles.link} onClick={() => navigate("/sensex")}>Sensex</span> */}
           <span style={styles.link} onClick={() => navigate("/direction")}>Direction</span>
           <span style={styles.link} onClick={() => navigate("/risk")}>Risk</span>
-          <span style={styles.link} onClick={() => navigate("/peer-comparison")}>Peer AI</span>
+          {/* <span style={styles.link} onClick={() => navigate("/sentiment")}>Sentiment</span> */}
+          <span style={styles.link} onClick={() => navigate("/peer-comparison")}>Comparison</span>
           <span style={styles.link} onClick={() => navigate("/information")}>Information</span>
           <span style={styles.link} onClick={() => navigate("/news")}>News</span>
+        </div>
+
+        <div>
+          <button style={styles.phoneBtn}>1-800-366-9833</button>
+          <button style={styles.contactBtn}>Contact us</button>
         </div>
       </div>
 

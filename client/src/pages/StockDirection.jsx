@@ -2,25 +2,53 @@ import React, { useState } from "react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
 
+// 🔥 IMPORTS
+import MarketHeatmap from "../components/MarketHeatmap";
+import AccuracyWidget from "../components/AccuracyWidget";
+
 function StockDirection() {
   const navigate = useNavigate();
 
-  const [symbol, setSymbol] = useState("AAPL");
+  const [symbol, setSymbol] = useState("");           // selected stock
+  const [heatmapSymbol, setHeatmapSymbol] = useState(null); // confirmed stock
   const [result, setResult] = useState(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
 
   const predictDirection = async () => {
+
+    // 🚨 VALIDATION
+    if (!symbol) {
+      setError("Please select a stock first.");
+      return;
+    }
+
     try {
       setLoading(true);
       setError("");
       setResult(null);
 
+      // 🔹 1. Get prediction
       const res = await axios.post("http://localhost:5001/api/direction", {
         symbol,
       });
 
       setResult(res.data);
+
+      // 🔹 2. Log prediction (safe, non-blocking)
+      axios
+        .post("http://localhost:5008/api/log-prediction", {
+          symbol: symbol,
+          predicted: res.data.prediction.direction,
+          actual: null, // filled later
+        })
+        .catch(() => {
+          console.warn("Accuracy log failed (not critical)");
+        });
+
+      // 🔹 3. Update heatmap ONLY after predict
+      setHeatmapSymbol(symbol);
+
     } catch (err) {
       setError("Prediction failed. Check backend.");
     } finally {
@@ -36,10 +64,8 @@ function StockDirection() {
 
         <div style={styles.navLinks}>
           <span style={styles.link} onClick={() => navigate("/dashboard")}>Dashboard</span>
-          {/* <span style={styles.link} onClick={() => navigate("/sensex")}>Sensex</span> */}
           <span style={styles.link} onClick={() => navigate("/direction")}>Direction</span>
           <span style={styles.link} onClick={() => navigate("/risk")}>Risk</span>
-          {/* <span style={styles.link} onClick={() => navigate("/sentiment")}>Sentiment</span> */}
           <span style={styles.link} onClick={() => navigate("/peer-comparison")}>Comparison</span>
           <span style={styles.link} onClick={() => navigate("/information")}>Information</span>
           <span style={styles.link} onClick={() => navigate("/news")}>News</span>
@@ -53,6 +79,11 @@ function StockDirection() {
 
       {/* BODY */}
       <div style={styles.body}>
+
+        {/* 🔥 LIVE ACCURACY TRACKER */}
+        {result && <AccuracyWidget />}
+
+        {/* 🔹 PREDICTION CARD */}
         <div style={styles.card}>
           <h2 style={styles.heading}>AI Stock Direction Predictor</h2>
 
@@ -62,14 +93,14 @@ function StockDirection() {
             onChange={(e) => setSymbol(e.target.value)}
             style={styles.select}
           >
-            <option>-- Select Stock Symbol --</option>
-            <option>AAPL</option>
-            <option>MSFT</option>
-            <option>GOOGL</option>
-            <option>AMZN</option>
-            <option>TSLA</option>
-            <option>META</option>
-            <option>NFLX</option>
+            <option value="">-- Select Stock --</option>
+            <option value="AAPL">AAPL</option>
+            <option value="MSFT">MSFT</option>
+            <option value="GOOGL">GOOGL</option>
+            <option value="AMZN">AMZN</option>
+            <option value="TSLA">TSLA</option>
+            <option value="META">META</option>
+            <option value="NFLX">NFLX</option>
           </select>
 
           <button style={styles.predictBtn} onClick={predictDirection}>
@@ -84,8 +115,10 @@ function StockDirection() {
                 style={{
                   color:
                     result.prediction.direction === "BULLISH"
-                      ? "green" 
-                      : "red",
+                      ? "green"
+                      : result.prediction.direction === "BEARISH"
+                      ? "red"
+                      : "#ca8a04",
                 }}
               >
                 {result.prediction.direction}
@@ -101,6 +134,12 @@ function StockDirection() {
             </div>
           )}
         </div>
+
+        {/* 🔥 HEATMAP — ONLY AFTER PREDICT */}
+        {heatmapSymbol && (
+          <MarketHeatmap symbol={heatmapSymbol} />
+        )}
+
       </div>
     </div>
   );
@@ -108,7 +147,7 @@ function StockDirection() {
 
 export default StockDirection;
 
-/* ====================== STYLES (MUST BE HERE) ====================== */
+/* ====================== STYLES ====================== */
 
 const styles = {
   page: {
@@ -160,6 +199,7 @@ const styles = {
     padding: "30px",
     borderRadius: "12px",
     maxWidth: "600px",
+    marginTop: "25px",
   },
   heading: {
     marginBottom: "20px",
