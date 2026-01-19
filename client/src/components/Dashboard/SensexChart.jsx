@@ -12,7 +12,7 @@ import {
 
 export default function SensexChart() {
   const [data, setData] = useState([]);
-  const [range, setRange] = useState("1D");
+  const [range, setRange] = useState("1W");
   const [loading, setLoading] = useState(false);
 
   useEffect(() => {
@@ -65,7 +65,7 @@ export default function SensexChart() {
       <div style={styles.header}>
         <h2 style={{ margin: 0 }}>📊 BSE Sensex</h2>
         <div style={styles.rangeButtons}>
-          {["1D", "1W", "1M", "3M", "1Y"].map((r) => (
+          {["1W", "1M", "3M", "1Y"].map((r) => (
             <button
               key={r}
               onClick={() => setRange(r)}

@@ -9,33 +9,43 @@ export default function MarketCards() {
   const [loser, setLoser] = useState("Loading...");
 
   useEffect(() => {
-
-    // FETCH SENSEX LAST PRICE
+    // ---------------- FETCH SENSEX ----------------
     axios
-      .get("http://localhost:5001/api/sensex?range=1D")
+      .get("http://localhost:5001/api/sensex?range=1W")   // 🔥 changed from 1D → 1W
       .then((res) => {
-        const result = res.data.chart.result[0];
-        const close = result.indicators.quote[0].close;
-        const lastPrice = close[close.length - 1];
-        setSensex(lastPrice.toFixed(2));
-      })
-      .catch(() => setSensex("Error"));
+        const result = res.data.chart?.result?.[0];
 
-    // FETCH NIFTY LAST PRICE (FIXED)
+        if (!result || !result.meta?.regularMarketPrice) {
+          setSensex("Error");
+          return;
+        }
+
+        setSensex(result.meta.regularMarketPrice.toFixed(2));
+      })
+      .catch((err) => {
+        console.error("Sensex Card Error:", err);
+        setSensex("Error");
+      });
+
+    // ---------------- FETCH NIFTY ----------------
     axios
-      .get("http://localhost:5001/api/nifty?range=1D")
+      .get("http://localhost:5001/api/nifty?range=1W")
       .then((res) => {
-        const result = res.data.chart.result[0];
-        const close = result.indicators.quote[0].close;
-        const lastPrice = close[close.length - 1];
-        setNifty(lastPrice.toFixed(2));
-      })
-      .catch(() => setNifty("Error"));
+        if (!res.data || res.data.value === undefined) {
+          setNifty("Error");
+          return;
+        }
 
-    // TEMPORARY SENTIMENT (until API built)
+        setNifty(Number(res.data.value).toFixed(2));
+      })
+      .catch((err) => {
+        console.error("Nifty Card Error:", err);
+        setNifty("Error");
+      });
+
+
+    // ---------------- TEMP DATA ----------------
     setSentiment("Bullish");
-
-    // TEMPORARY TOP GAINER & LOSER
     setGainer("RELIANCE +2.4%");
     setLoser("TCS -1.1%");
   }, []);

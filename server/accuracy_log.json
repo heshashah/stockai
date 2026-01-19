@@ -145,5 +145,222 @@
     "actual": "SIDEWAYS",
     "horizon": "1D",
     "date": "2026-01"
+  },
+  {
+    "symbol": "AAPL",
+    "predicted": "BEARISH",
+    "actual": "BULLISH",
+    "horizon": "1D",
+    "date": "2026-01"
+  },
+  {
+    "symbol": "TSLA",
+    "predicted": "BEARISH",
+    "actual": "SIDEWAYS",
+    "horizon": "1D",
+    "date": "2026-01"
+  },
+  {
+    "symbol": "AMZN",
+    "predicted": "SIDEWAYS",
+    "actual": "BULLISH",
+    "horizon": "1D",
+    "date": "2026-01"
+  },
+  {
+    "symbol": "NFLX",
+    "predicted": "SIDEWAYS",
+    "actual": "BULLISH",
+    "horizon": "1D",
+    "date": "2026-01"
+  },
+  {
+    "symbol": "TSLA",
+    "predicted": "BEARISH",
+    "actual": "SIDEWAYS",
+    "horizon": "1D",
+    "date": "2026-01"
+  },
+  {
+    "symbol": "AAPL",
+    "predicted": "BEARISH",
+    "actual": "BEARISH",
+    "horizon": "1D",
+    "date": "2026-01"
+  },
+  {
+    "symbol": "GOOGL",
+    "predicted": "SIDEWAYS",
+    "actual": "BEARISH",
+    "horizon": "1D",
+    "date": "2026-01"
+  },
+  {
+    "symbol": "AAPL",
+    "predicted": "BEARISH",
+    "actual": "BULLISH",
+    "horizon": "1D",
+    "date": "2026-01"
+  },
+  {
+    "symbol": "MSFT",
+    "predicted": "SIDEWAYS",
+    "actual": "BEARISH",
+    "horizon": "1D",
+    "date": "2026-01"
+  },
+  {
+    "symbol": "MSFT",
+    "predicted": "SIDEWAYS",
+    "actual": "BEARISH",
+    "horizon": "1D",
+    "date": "2026-01"
+  },
+  {
+    "symbol": "AMZN",
+    "predicted": "SIDEWAYS",
+    "actual": "BULLISH",
+    "horizon": "1D",
+    "date": "2026-01"
+  },
+  {
+    "symbol": "AMZN",
+    "predicted": "SIDEWAYS",
+    "actual": "BULLISH",
+    "horizon": "1D",
+    "date": "2026-01"
+  },
+  {
+    "symbol": "AAPL",
+    "predicted": "BEARISH",
+    "actual": "SIDEWAYS",
+    "horizon": "1D",
+    "date": "2026-01"
+  },
+  {
+    "symbol": "AMZN",
+    "predicted": "SIDEWAYS",
+    "actual": "SIDEWAYS",
+    "horizon": "1D",
+    "date": "2026-01"
+  },
+  {
+    "symbol": "AMZN",
+    "predicted": "SIDEWAYS",
+    "actual": "BEARISH",
+    "horizon": "1D",
+    "date": "2026-01"
+  },
+  {
+    "symbol": "MSFT",
+    "predicted": "SIDEWAYS",
+    "actual": "SIDEWAYS",
+    "horizon": "1D",
+    "date": "2026-01"
+  },
+  {
+    "symbol": "MSFT",
+    "predicted": "SIDEWAYS",
+    "actual": "BULLISH",
+    "horizon": "1D",
+    "date": "2026-01"
+  },
+  {
+    "symbol": "MSFT",
+    "predicted": "SIDEWAYS",
+    "actual": "BULLISH",
+    "horizon": "1D",
+    "date": "2026-01"
+  },
+  {
+    "symbol": "AAPL",
+    "predicted": "BEARISH",
+    "actual": "BULLISH",
+    "horizon": "1D",
+    "date": "2026-01"
+  },
+  {
+    "symbol": "MSFT",
+    "predicted": "SIDEWAYS",
+    "actual": "BEARISH",
+    "horizon": "1D",
+    "date": "2026-01"
+  },
+  {
+    "symbol": "TSLA",
+    "predicted": "BEARISH",
+    "actual": "BULLISH",
+    "horizon": "1D",
+    "date": "2026-01"
+  },
+  {
+    "symbol": "NFLX",
+    "predicted": "SIDEWAYS",
+    "actual": "SIDEWAYS",
+    "horizon": "1D",
+    "date": "2026-01"
+  },
+  {
+    "symbol": "AMZN",
+    "predicted": "SIDEWAYS",
+    "actual": "BULLISH",
+    "horizon": "1D",
+    "date": "2026-01"
+  },
+  {
+    "symbol": "META",
+    "predicted": "BEARISH",
+    "actual": "BULLISH",
+    "horizon": "1D",
+    "date": "2026-01"
+  },
+  {
+    "symbol": "NFLX",
+    "predicted": "SIDEWAYS",
+    "actual": "BULLISH",
+    "horizon": "1D",
+    "date": "2026-01"
+  },
+  {
+    "symbol": "AAPL",
+    "predicted": "BEARISH",
+    "actual": "BULLISH",
+    "horizon": "1D",
+    "date": "2026-01"
+  },
+  {
+    "symbol": "AAPL",
+    "predicted": "BEARISH",
+    "actual": "SIDEWAYS",
+    "horizon": "1D",
+    "date": "2026-01"
+  },
+  {
+    "symbol": "AAPL",
+    "predicted": "BEARISH",
+    "actual": "BULLISH",
+    "horizon": "1D",
+    "date": "2026-01"
+  },
+  {
+    "symbol": "AAPL",
+    "predicted": "BEARISH",
+    "actual": "BEARISH",
+    "horizon": "1D",
+    "date": "2026-01"
+  },
+  {
+    "symbol": "AAPL",
+    "predicted": "BEARISH",
+    "actual": "BEARISH",
+    "horizon": "1D",
+    "date": "2026-01"
+  },
+  {
+    "symbol": "MSFT",
+    "predicted": "BEARISH",
+    "actual": "BULLISH",
+    "horizon": "1D",
+    "date": "2026-01"
   }
 ]

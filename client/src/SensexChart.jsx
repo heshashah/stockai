@@ -15,13 +15,20 @@ export default function SensexChart() {
   const navigate = useNavigate();
 
   const [data, setData] = useState([]);
-  const [range, setRange] = useState("1D");
+  const [range, setRange] = useState("1W"); 
   const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
 
   useEffect(() => {
+    let intervalId;
+
     const fetchData = async () => {
       try {
         setLoading(true);
+        setError("");
+
+        // Clear old data
+        setData([]);
 
         const res = await axios.get(
           `http://localhost:5001/api/sensex?range=${range}`
@@ -34,7 +41,7 @@ export default function SensexChart() {
           !result.timestamp ||
           !result.indicators?.quote?.[0]?.close
         ) {
-          console.error("Invalid data format", res.data);
+          setError("No data available for this time range.");
           setLoading(false);
           return;
         }
@@ -47,26 +54,33 @@ export default function SensexChart() {
         for (let i = 0; i < timestamps.length; i++) {
           if (prices[i] !== null && prices[i] !== undefined) {
             formatted.push({
-              time:
-                range === "1D"
-                  ? new Date(timestamps[i] * 1000).toLocaleTimeString()
-                  : new Date(timestamps[i] * 1000).toLocaleDateString(),
+              time: new Date(timestamps[i] * 1000).toLocaleDateString(),
               value: prices[i],
             });
           }
         }
 
-        console.log("Formatted data length:", formatted.length);
+        if (formatted.length === 0) {
+          setError("No market data available.");
+        }
 
         setData(formatted);
         setLoading(false);
       } catch (err) {
         console.error("Sensex Fetch Error:", err);
+        setError("Failed to load Sensex data.");
         setLoading(false);
       }
     };
 
+    // Fetch immediately
     fetchData();
+
+    // Auto-refresh every 20 seconds
+    intervalId = setInterval(fetchData, 20000);
+
+    // Cleanup
+    return () => clearInterval(intervalId);
   }, [range]);
 
   return (
@@ -76,13 +90,21 @@ export default function SensexChart() {
         <h3 style={styles.logo}>StockAI</h3>
 
         <div style={styles.navLinks}>
-          <span style={styles.link} onClick={() => navigate("/dashboard")}>Dashboard</span>
-          {/* <span style={styles.link} onClick={() => navigate("/sensex")}>Sensex</span> */}
-          <span style={styles.link} onClick={() => navigate("/direction")}>Direction</span>
-          <span style={styles.link} onClick={() => navigate("/risk")}>Risk</span>
-          {/* <span style={styles.link} onClick={() => navigate("/sentiment")}>Sentiment</span> */}
-          <span style={styles.link} onClick={() => navigate("/information")}>Information</span>
-          <span style={styles.link} onClick={() => navigate("/news")}>News</span>
+          <span style={styles.link} onClick={() => navigate("/dashboard")}>
+            Dashboard
+          </span>
+          <span style={styles.link} onClick={() => navigate("/direction")}>
+            Direction
+          </span>
+          <span style={styles.link} onClick={() => navigate("/risk")}>
+            Risk
+          </span>
+          <span style={styles.link} onClick={() => navigate("/information")}>
+            Information
+          </span>
+          <span style={styles.link} onClick={() => navigate("/news")}>
+            News
+          </span>
         </div>
 
         <div>
@@ -98,9 +120,9 @@ export default function SensexChart() {
           Live market performance of Sensex
         </p>
 
-        {/* RANGE BUTTONS */}
+        {/* RANGE BUTTONS (1D REMOVED) */}
         <div style={styles.rangeButtons}>
-          {["1D", "1W", "1M"].map((r) => (
+          {["1W", "1M"].map((r) => (
             <button
               key={r}
               onClick={() => setRange(r)}
@@ -120,6 +142,10 @@ export default function SensexChart() {
           {loading ? (
             <p style={{ textAlign: "center", marginTop: "180px", color: "#888" }}>
               Loading Sensex data...
+            </p>
+          ) : error ? (
+            <p style={{ textAlign: "center", marginTop: "180px", color: "#c0392b" }}>
+              {error}
             </p>
           ) : (
             <ResponsiveContainer width="100%" height="100%">
@@ -145,7 +171,7 @@ export default function SensexChart() {
   );
 }
 
-/* STYLES */
+/* ---------------- STYLES ---------------- */
 const styles = {
   page: {
     minHeight: "100vh",
