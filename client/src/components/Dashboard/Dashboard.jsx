@@ -1,6 +1,8 @@
 import React from "react";
 import { useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
+import axios from "axios";
+import { useEffect } from "react";
 
 // Import Dashboard widgets
 import MarketCards from "./MarketCards";

@@ -1,7 +1,0 @@
-node_modules
-venv
-.env
-.git
-.gitignore
-.DS_Store
-npm-debug.log
