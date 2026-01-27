@@ -1,4 +1,4 @@
-// Load .env 
+// Load .env
 import dotenv from "dotenv";
 dotenv.config();
 
@@ -10,56 +10,60 @@ import { OAuth2Client } from "google-auth-library";
 import { spawn } from "child_process";
 import path from "path";
 import { fileURLToPath } from "url";
+import Groq from "groq-sdk";
 
+// ---------------- PATH SETUP ----------------
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
-import Groq from "groq-sdk";
-const groq = new Groq({ apiKey: process.env.GROQ_API_KEY });
-
-console.log("FMP_API_KEY =", process.env.FMP_API_KEY);
-
+// ---------------- APP ----------------
 const app = express();
 
-/* FRONTEND CONFIG */
+const groq = new Groq({
+  apiKey: process.env.GROQ_API_KEY,
+});
+
+// ---------------- CORS ----------------
 app.use(
   cors({
-    origin: "http://localhost:3000",
+    origin: [
+      "http://localhost:3000",
+      "https://stockai.vercel.app"
+    ],
     methods: ["GET", "POST"],
+    credentials: true
   })
 );
 
 app.use(express.json());
 
-/* LOAD ROUTES */
+// ---------------- ROUTES ----------------
 import sentimentRoutes from "./routes/sentimentRoute.js";
-app.use("/api", sentimentRoutes);
-
 import niftyRoute from "./routes/niftyRoute.js";
-app.use("/api/nifty", niftyRoute);
-
 import newsRoute from "./newsRoute.js";
-app.use("/api/news", newsRoute);
-
 import sensexRoute from "./routes/sensexRoute.js";
-app.use("/api/sensex", sensexRoute);
-
 import sectorRoute from "./routes/sectorRoute.js";
-app.use("/api", sectorRoute);
-
 import ipoRoute from "./routes/ipoRoute.js";
-app.use("/", ipoRoute);
-
 import aiPicksRoute from "./routes/aiPicksRoute.js";
-app.use("/api/ai-picks", aiPicksRoute);
-
 import stockDirectionRoute from "./routes/stockDirectionRoute.js";
-app.use("/api/direction", stockDirectionRoute);
+import peerDynamicRoute from "./routes/peerDynamicRoute.js";
+import peerAlphaRoute from "./routes/peerAlphaRoute.js";
 
-/* GOOGLE LOGIN SETUP */
+app.use("/api", sentimentRoutes);
+app.use("/api/nifty", niftyRoute);
+app.use("/api/news", newsRoute);
+app.use("/api/sensex", sensexRoute);
+app.use("/api", sectorRoute);
+app.use("/", ipoRoute);
+app.use("/api/ai-picks", aiPicksRoute);
+app.use("/api/direction", stockDirectionRoute);
+app.use("/api/peer-dynamic", peerDynamicRoute);
+app.use("/api/peer-alpha", peerAlphaRoute);
+
+// ---------------- GOOGLE LOGIN ----------------
 const client = new OAuth2Client(process.env.GOOGLE_CLIENT_ID);
 
-/* MYSQL CONNECTION */
+// ---------------- MYSQL ----------------
 const db = mysql.createConnection({
   host: process.env.DB_HOST,
   user: process.env.DB_USER,
@@ -71,11 +75,11 @@ db.connect((err) => {
   if (err) {
     console.error("❌ MySQL connection failed:", err);
   } else {
-    console.log("✅ MySQL connected successfully");
+    console.log("✅ MySQL connected");
   }
 });
 
-/* GOOGLE LOGIN API */
+// ---------------- GOOGLE LOGIN API ----------------
 app.post("/google-login", async (req, res) => {
   try {
     const { token } = req.body;
@@ -85,33 +89,31 @@ app.post("/google-login", async (req, res) => {
       audience: process.env.GOOGLE_CLIENT_ID,
     });
 
-    const payload = ticket.getPayload();
-    const { name, email, picture } = payload;
+    const { name, email, picture } = ticket.getPayload();
 
     db.query(
       "INSERT INTO users (name, email, picture) VALUES (?, ?, ?)",
       [name, email, picture],
-      (err) => {
-        if (err) return res.status(500).json({ error: "DB error" });
-
-        res.json({ message: "User saved", user: { name, email, picture } });
+      () => {
+        res.json({
+          message: "User saved",
+          user: { name, email, picture },
+        });
       }
     );
-  } catch (error) {
+  } catch {
     res.status(401).json({ error: "Invalid token" });
   }
 });
 
-/* -------------------------------------------------
-   ✅ NEW MODULE: PEER COMPARISON AI ENGINE
---------------------------------------------------*/
+// =================================================
+// ✅ PEER COMPARISON AI ENGINE
+// =================================================
 app.post("/api/peer-ai", (req, res) => {
   try {
-    const python = spawn(
-      "/Users/heshashah/stockai/server/venv/bin/python3",
-      ["ai/peer_ai.py"],
-      { cwd: __dirname }
-    );
+    const python = spawn("python3", ["ai/peer_ai.py"], {
+      cwd: __dirname,
+    });
 
     python.stdin.write(JSON.stringify(req.body));
     python.stdin.end();
@@ -123,66 +125,55 @@ app.post("/api/peer-ai", (req, res) => {
     });
 
     python.stderr.on("data", (data) => {
-      console.error("🐍 Python error:", data.toString());
+      console.error("🐍 Peer AI error:", data.toString());
     });
 
     python.on("close", () => {
-      if (!output) {
-        return res.status(500).json({ error: "Python returned no output" });
-      }
-
       try {
-        const result = JSON.parse(output);
-        res.json(result);
-      } catch (error) {
-        console.error("❌ Peer AI JSON parse error:", output);
+        res.json(JSON.parse(output));
+      } catch {
         res.status(500).json({
           error: "Invalid AI response",
-          raw: output
+          raw: output,
         });
       }
     });
-
-  } catch (error) {
-    console.error("❌ Peer AI Node error:", error);
-    res.status(500).json({ error: "Server error" });
+  } catch (err) {
+    res.status(500).json({ error: "Peer AI server error" });
   }
 });
 
-/* IPO RISK API (PYTHON ML ENGINE) */
+// =================================================
+// ✅ IPO RISK API (ML ENGINE)
+// =================================================
 app.post("/api/risk", (req, res) => {
   try {
-    const python = spawn(
-      "/Users/heshashah/stockai/server/venv/bin/python3",
-      ["ipo_risk_api.py"],
-      { cwd: __dirname }
-    );
+    const python = spawn("python3", ["ipo_risk_api.py"], {
+      cwd: __dirname,
+    });
 
     python.stdin.write(JSON.stringify(req.body));
     python.stdin.end();
 
     let output = "";
 
-    python.stdout.on("data", (data) => {
-      output += data.toString();
-    });
+    python.stdout.on("data", (d) => (output += d.toString()));
 
     python.on("close", () => {
       try {
-        const result = JSON.parse(output);
-        res.json(result);
-      } catch (error) {
-        console.error("❌ Python output error:", error);
+        res.json(JSON.parse(output));
+      } catch {
         res.status(500).json({ error: "ML Engine Failed" });
       }
     });
-  } catch (error) {
-    console.error("❌ Node Risk API error:", error);
+  } catch {
     res.status(500).json({ error: "Server error" });
   }
 });
 
-/* IPO DETAILS API (GROQ + Sentiment) */
+// =================================================
+// ✅ IPO DETAILS (IPO WATCH + GROQ + SENTIMENT)
+// =================================================
 app.get("/api/ipo", async (req, res) => {
   const key = req.query.key;
 
@@ -198,33 +189,37 @@ app.get("/api/ipo", async (req, res) => {
   const ipoName = ipoList.default[key];
 
   try {
-    /* Fetch IPOWatch data */
-    const py1 = spawn(
-      "/Library/Frameworks/Python.framework/Versions/3.12/bin/python3.12",
-      ["get_ipo_data.py"]
-    );
+    // -------- IPOWATCH --------
+    const py1 = spawn("python3", ["get_ipo_data.py"], {
+      cwd: __dirname,
+    });
 
     py1.stdin.write(JSON.stringify({ key }));
     py1.stdin.end();
 
     let ipoOutput = "";
+
     py1.stdout.on("data", (d) => (ipoOutput += d.toString()));
 
     py1.on("close", async () => {
       let ipowatchData = {};
+
       try {
         ipowatchData = JSON.parse(ipoOutput);
-      } catch (err) {
-        return res.json({ error: "Invalid IPOWatch output", raw: ipoOutput });
+      } catch {
+        return res.json({
+          error: "Invalid IPOWatch output",
+          raw: ipoOutput,
+        });
       }
 
-      /* Generate AI Headlines (Groq) */
+      // -------- GROQ AI HEADLINES --------
       const prompt = `
-Generate 3 realistic and unique news headlines about the IPO "${ipoName}".
-- One positive
-- One negative
-- One neutral
-Output ONLY a JSON array.
+Generate 3 realistic news headlines about IPO "${ipoName}"
+- one positive
+- one negative
+- one neutral
+Return ONLY JSON array
 `;
 
       let aiHeadlines = [];
@@ -235,33 +230,35 @@ Output ONLY a JSON array.
           messages: [{ role: "user", content: prompt }],
         });
 
-        aiHeadlines = JSON.parse(response.choices[0].message.content);
-      } catch (err) {
+        aiHeadlines = JSON.parse(
+          response.choices[0].message.content
+        );
+      } catch {
         aiHeadlines = [
           `${ipoName} IPO opens for subscription`,
-          `${ipoName} IPO receives mixed investor sentiment`,
-          `${ipoName} IPO sees cautious demand`,
+          `${ipoName} IPO sees mixed response`,
+          `${ipoName} IPO faces cautious sentiment`,
         ];
       }
 
-      /* Run sentiment analysis */
-      const py2 = spawn(
-        "/Users/heshashah/stockai/venv/bin/python3",
-        ["/Users/heshashah/stockai/python/ipo_sentiment.py"],
-        { shell: true }
-      );
+      // -------- SENTIMENT ML --------
+      const py2 = spawn("python3", ["python/ipo_sentiment.py"], {
+        cwd: __dirname,
+      });
 
       py2.stdin.write(JSON.stringify({ news: aiHeadlines }));
       py2.stdin.end();
 
       let sentiOutput = "";
+
       py2.stdout.on("data", (d) => (sentiOutput += d.toString()));
 
       py2.on("close", () => {
         let sentiment = {};
+
         try {
           sentiment = JSON.parse(sentiOutput);
-        } catch (err) {
+        } catch {
           sentiment = {
             sentiment: "Unknown",
             overall_score: 0,
@@ -269,7 +266,6 @@ Output ONLY a JSON array.
           };
         }
 
-        /* Prepare dummy market data */
         const market = {
           market_price: Math.floor(Math.random() * 500),
           market_cap: `${Math.floor(Math.random() * 10000)} Cr`,
@@ -278,7 +274,6 @@ Output ONLY a JSON array.
           industry: "Software Services",
         };
 
-        /* Final Response */
         res.json({
           ipowatch: ipowatchData,
           market,
@@ -294,55 +289,46 @@ Output ONLY a JSON array.
   }
 });
 
-/* AI IPO RISK (TEXT ML) */
+// =================================================
+// ✅ AI IPO TEXT RISK
+// =================================================
 app.post("/api/ipo/ai", (req, res) => {
-  const python = spawn("python3", ["ipo_risk_api.py"]);
+  const python = spawn("python3", ["ipo_risk_api.py"], {
+    cwd: __dirname,
+  });
 
   python.stdin.write(JSON.stringify(req.body));
   python.stdin.end();
 
   let result = "";
 
-  python.stdout.on("data", (chunk) => {
-    result += chunk.toString();
-  });
+  python.stdout.on("data", (d) => (result += d.toString()));
 
-  python.stdout.on("end", () => {
+  python.on("end", () => {
     try {
       res.json(JSON.parse(result));
-    } catch (err) {
+    } catch {
       res.status(500).json({ error: "AI model failed" });
     }
   });
 
-  python.stderr.on("data", (data) => {
-    console.error("AI ERROR:", data.toString());
+  python.stderr.on("data", (e) => {
+    console.error("AI ERROR:", e.toString());
   });
 });
 
-import peerDynamicRoute from "./routes/peerDynamicRoute.js";
-app.use("/api/peer-dynamic", peerDynamicRoute);
-
-import peerAlphaRoute from "./routes/peerAlphaRoute.js";
-app.use("/api/peer-alpha", peerAlphaRoute);
-
-
-/* ROOT */
+// ---------------- ROOT ----------------
 app.get("/", (req, res) => {
   res.json({
     service: "StockAI Backend",
     status: "running",
-    port: 5001
+    port: process.env.PORT || "dynamic",
   });
 });
 
-/* TEST ROUTE */
-app.get("/test", (req, res) => {
-  res.send("Backend is working");
-});
-
-/* START SERVER */
+// ---------------- START SERVER ----------------
 const PORT = process.env.PORT || 5001;
+
 app.listen(PORT, () => {
-  console.log(`🚀 Server running at http://localhost:${PORT}`);
+  console.log(`🚀 StockAI backend running on port ${PORT}`);
 });
