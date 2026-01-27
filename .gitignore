@@ -1,1 +1,17 @@
-server/.env
+# Environment files
+.env
+
+# Node
+node_modules/
+dist/
+
+# Python virtual environments
+hybrid_env/
+server/hybrid_env/
+venv/
+
+# Mac system files
+.DS_Store
+
+# Native libs
+*.dylib

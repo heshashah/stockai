@@ -1,0 +1,10 @@
+{
+  "watch": ["."],
+  "ignore": [
+    "venv",
+    "hybrid_env",
+    "node_modules",
+    "**/__pycache__/**"
+  ],
+  "ext": "js,json"
+}
