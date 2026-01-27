@@ -1,17 +1,9 @@
-# Environment files
+node_modules
 .env
-
-# Node
-node_modules/
-dist/
-
-# Python virtual environments
-hybrid_env/
-server/hybrid_env/
-venv/
-
-# Mac system files
+venv
+python
+__pycache__
 .DS_Store
 
-# Native libs
-*.dylib
+
+
